@@ -7,7 +7,7 @@ a client for suno to use ai music generator
 
 ## Login to suno ai
 
-### for android and ios
+### For android and ios
 
 use in app webview to login to suno ai,will read token and save
 
@@ -15,11 +15,12 @@ click login button to login
 
 <img src="./doc/first.png" width=200 />
 
-login to suno and click 
+login to suno and click    `Im' already logined in` button
+
 <img src="./doc/already_login.png" width=200 />
 
 
-### for other platform
+### For other platform
 
 input cookie string to login
 
