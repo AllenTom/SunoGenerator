@@ -12,11 +12,9 @@ class HomeProvider with ChangeNotifier {
   List<SongMeta> songs = [];
   List<GenerateItem> generatingSong = [];
   bool isFirst = true;
-  Song? currentSong;
 
-
-  loadSongs() async {
-    if (client.cookie.isEmpty) {
+  loadSongs({bool force = false}) async {
+    if (client.cookie.isEmpty && !force) {
       return;
     }
     songs = await client.getSongMetadata();
@@ -35,22 +33,20 @@ class HomeProvider with ChangeNotifier {
     }
   }
 
-
-  updateCurrentSong(Song song) {
-    currentSong = song;
-    notifyListeners();
-  }
-
-  generateSong(String prompt, bool isInstrumental) async {
+  generateSong(String? prompt, String? lyrics, bool isInstrumental,
+      String? style, String? title) async {
     var updateStateController = StreamController<List<GenerateItem>>();
     updateStateController.stream.listen((event) {
       generatingSong = event;
       notifyListeners();
     });
     await client.generateSong(
-        prompt: prompt,
         updateStateController: updateStateController,
-        instrumental: isInstrumental);
+        prompt: prompt,
+        lyrics: lyrics,
+        isInstrumental: isInstrumental,
+        style: style,
+        title: title);
 
     generatingSong = [];
     notifyListeners();

@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:ffi';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
 import 'package:random_x/random_x.dart';
 import 'package:untitled/api/entity.dart';
@@ -21,7 +23,22 @@ class SunoClient {
     return _singleton;
   }
 
-  SunoClient._internal();
+  SunoClient._internal() {
+    dio.httpClientAdapter = IOHttpClientAdapter(
+      createHttpClient: () {
+        final client = HttpClient();
+        client.findProxy = (uri) {
+          // Proxy all request to localhost:8888.
+          // Be aware, the proxy should went through you running device,
+          // not the host platform.
+          return 'PROXY localhost:7890';
+        };
+        client.badCertificateCallback =
+            (X509Certificate cert, String host, int port) => true;
+        return client;
+      },
+    );
+  }
 
   void applyCookie(String cookieString) {
     cookie = cookieString;
@@ -41,7 +58,8 @@ class SunoClient {
       ),
     );
     if (response.statusCode == 200) {
-      token = response.data['response']['sessions'][0]['last_active_token']['jwt'];
+      token =
+          response.data['response']['sessions'][0]['last_active_token']['jwt'];
       sid = response.data['response']['last_active_session_id'];
       LoginInfo info = LoginInfo();
       if (sid != '') {
@@ -98,6 +116,7 @@ class SunoClient {
   }
 
   Future<List<SongMeta>> getSongMetadata() async {
+    await renewToken();
     var response = await dio.request('https://studio-api.suno.ai/api/feed',
         options: Options(method: 'GET', headers: {
           'Cookie': cookie,
@@ -113,18 +132,24 @@ class SunoClient {
   }
 
   Future<void> generateSong(
-      {required String prompt,
-      required StreamController<List<GenerateItem>> updateStateController,
-      instrumental = false}) async {
+      {required StreamController<List<GenerateItem>> updateStateController,
+      String? prompt,
+      String? lyrics,
+      bool isInstrumental = false,
+      String? style,
+      String? title}) async {
     await renewToken();
+    var requestData = {
+      "gpt_description_prompt": prompt,
+      "mv": "chirp-v3-0",
+      "prompt": lyrics,
+      "make_instrumental": isInstrumental,
+      "style": style,
+      "title": title
+    };
     var response =
         await dio.request('https://studio-api.suno.ai/api/generate/v2/',
-            data: {
-              "gpt_description_prompt": prompt,
-              "mv": "chirp-v3-0",
-              "prompt": "",
-              "make_instrumental": instrumental
-            },
+            data: requestData,
             options: Options(
               method: 'POST',
               headers: {
@@ -193,5 +218,61 @@ class SunoClient {
         }));
     Uint8List data = response.data;
     return data;
+  }
+
+  Future<String?> generateLyrics(String prompt) async {
+    var requestData = {
+      "prompt": prompt,
+    };
+    var response =
+        await dio.request('https://studio-api.suno.ai/api/generate/lyrics/',
+            data: requestData,
+            options: Options(
+              method: 'POST',
+              headers: {
+                'Cookie': cookie,
+                'User-Agent': ua,
+                'Accept': 'application/json',
+                'Authorization': 'Bearer $token'
+              },
+            ));
+    if (response.statusCode == 200) {
+      return response.data["id"];
+    } else {
+      print(response.statusMessage);
+      return null;
+    }
+  }
+
+  Future<GenerateLyricsResult?> getGenerateLyrics(String id) async {
+    var response =
+        await dio.request('https://studio-api.suno.ai/api/generate/lyrics/$id',
+            options: Options(
+              method: 'GET',
+              headers: {
+                'Cookie': cookie,
+                'User-Agent': ua,
+                'Accept': 'application/json',
+                'Authorization': 'Bearer $token'
+              },
+            ));
+    if (response.statusCode == 200) {
+      return GenerateLyricsResult.fromJson(response.data);
+    } else {
+      print(response.statusMessage);
+      return null;
+    }
+  }
+
+  Future<GenerateLyricsResult?> generateRandomLyrics(
+      {String prompt = ""}) async {
+    String? id = await generateLyrics(prompt);
+    if (id == null) {
+      return null;
+    }
+    // wait for 5 seconds
+    await Future.delayed(Duration(seconds: 5));
+    var result = await getGenerateLyrics(id);
+    return result;
   }
 }

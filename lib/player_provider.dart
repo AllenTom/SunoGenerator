@@ -1,12 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:untitled/api/entity.dart';
+import 'package:untitled/screens/home/home.dart';
 
 class PlayerProvider extends ChangeNotifier {
   AudioPlayer player = AudioPlayer();
   Duration? duration;
   Duration? currentPosition;
   PlayerState? playerState;
+  Song? currentSong;
 
   PlayerProvider() {
     player.positionStream.listen((event) {
@@ -23,8 +26,17 @@ class PlayerProvider extends ChangeNotifier {
     await player.dispose();
   }
 
-  setUrlAndPlay(String url) async {
+  setUrlAndPlay(SongMeta songMeta) async {
+    final url = songMeta.audioUrl;
+    if (url == null) {
+      return;
+    }
     duration = await player.setUrl(url);
+    currentSong = Song(
+        id: songMeta.id!,
+        title: songMeta.title!,
+        imageUrl: songMeta.imageUrl!,
+        duration: duration!);
     await player.play();
     notifyListeners();
   }

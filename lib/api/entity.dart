@@ -141,3 +141,25 @@ class LoginInfo {
   late String id;
   LoginInfo({this.firstName, this.lastName, this.avatar});
 }
+
+class GenerateLyricsResult {
+  String? text;
+  String? title;
+  String? status;
+
+  GenerateLyricsResult({this.text, this.title, this.status});
+
+  GenerateLyricsResult.fromJson(Map<String, dynamic> json) {
+    text = json['text'];
+    title = json['title'];
+    status = json['status'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['text'] = text;
+    data['title'] = title;
+    data['status'] = status;
+    return data;
+  }
+}

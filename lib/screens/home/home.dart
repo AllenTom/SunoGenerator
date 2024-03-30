@@ -38,19 +38,8 @@ class Song {
 }
 
 class _HomePageState extends State<HomePage> {
-
-
   @override
   Widget build(BuildContext context) {
-    Future<void> refresh(BuildContext context) async {
-      final homeProvider = Provider.of<HomeProvider>(context, listen: false);
-      homeProvider.loadSongs();
-    }
-
-
-
-
-
 
 
     downloadAudioFile(String fileUrl, String title) async {
@@ -71,8 +60,8 @@ class _HomePageState extends State<HomePage> {
 
     return ChangeNotifierProvider(
         create: (_) => HomeProvider(),
-        child: Consumer3<UserProvider, HomeProvider,PlayerProvider>(
-            builder: (context, userProvider, homeProvider,playerProvider, _) {
+        child: Consumer3<UserProvider, HomeProvider, PlayerProvider>(
+            builder: (context, userProvider, homeProvider, playerProvider, _) {
           initData() async {
             SunoClient client = SunoClient();
             if (homeProvider.isFirst) {
@@ -86,8 +75,12 @@ class _HomePageState extends State<HomePage> {
 
           initData();
 
-          void generateSong(String prompt, bool isInstrumental) async {
-            homeProvider.generateSong(prompt, isInstrumental);
+          void generateSong(String? prompt,String? lyrics, bool isInstrumental,String? style,String? title) async {
+            homeProvider.generateSong(prompt, lyrics, isInstrumental, style, title);
+          }
+
+          Future<void> refresh({bool force = false}) async {
+            await homeProvider.loadSongs(force: force);
           }
 
           void openNewSongDialog() {
@@ -95,8 +88,8 @@ class _HomePageState extends State<HomePage> {
                 context: context,
                 builder: (context) {
                   return NewSongDialog(
-                    onGenerate: (prompt, isInstrumental) {
-                      generateSong(prompt, isInstrumental);
+                    onGenerate: (prompt, lyrics, isInstrumental, style, title) {
+                      generateSong(prompt, lyrics, isInstrumental, style, title);
                     },
                   );
                 });
@@ -106,13 +99,15 @@ class _HomePageState extends State<HomePage> {
             SunoClient client = SunoClient();
             client.applyCookie(cookieString);
             initData();
-            await refresh(context);
+            await refresh();
           }
+
           Future<void> onLoginOut(BuildContext context) async {
             await playerProvider.disposePlayer();
             userProvider.loginOut();
             homeProvider.toInit();
           }
+
           void _showUserInfoDialog() {
             showDialog(
               context: context,
@@ -130,8 +125,8 @@ class _HomePageState extends State<HomePage> {
                               width: 64,
                               height: 64,
                               child: CircleAvatar(
-                                backgroundImage:
-                                NetworkImage(userProvider.loginInfo!.avatar!),
+                                backgroundImage: NetworkImage(
+                                    userProvider.loginInfo!.avatar!),
                               ),
                             ),
                             Text(
@@ -152,44 +147,48 @@ class _HomePageState extends State<HomePage> {
                       Divider(),
                       AppDataStore().config.users.where((element) {
                         return element.id != userProvider.loginInfo!.id;
-                      }).isNotEmpty?
-                      Column(
-                        children: [
-                          Container(
-                              margin: const EdgeInsets.only(bottom: 16, top: 16),
-                              child: Text("switch to")),
-                          ...AppDataStore().config.users.where((element) {
-                            return element.id != userProvider.loginInfo!.id;
-                          }).map((user) {
-                            return GestureDetector(
-                              onTap: () async {
-                                Navigator.of(context).pop();
-                                await onLogin(user.token);
-                              },
-                              child: Container(
-                                margin: const EdgeInsets.only(bottom: 16),
-                                width: double.infinity,
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      margin: const EdgeInsets.only(right: 16),
-                                      width: 48,
-                                      height: 48,
-                                      child: CircleAvatar(
-                                        backgroundImage: NetworkImage(user.avatar!),
+                      }).isNotEmpty
+                          ? Column(
+                              children: [
+                                Container(
+                                    margin: const EdgeInsets.only(
+                                        bottom: 16, top: 16),
+                                    child: Text("switch to")),
+                                ...AppDataStore().config.users.where((element) {
+                                  return element.id !=
+                                      userProvider.loginInfo!.id;
+                                }).map((user) {
+                                  return GestureDetector(
+                                    onTap: () async {
+                                      Navigator.of(context).pop();
+                                      await onLogin(user.token);
+                                    },
+                                    child: Container(
+                                      margin: const EdgeInsets.only(bottom: 16),
+                                      width: double.infinity,
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            margin: const EdgeInsets.only(
+                                                right: 16),
+                                            width: 48,
+                                            height: 48,
+                                            child: CircleAvatar(
+                                              backgroundImage:
+                                                  NetworkImage(user.avatar!),
+                                            ),
+                                          ),
+                                          Expanded(
+                                              child: Text(
+                                                  "${user.firstName} ${user.lastName}")),
+                                        ],
                                       ),
                                     ),
-                                    Expanded(
-                                        child:
-                                        Text("${user.firstName} ${user.lastName}")),
-                                  ],
-                                ),
-                              ),
-                            );
-                          })
-                        ],
-                      ):Container()
-
+                                  );
+                                })
+                              ],
+                            )
+                          : Container()
                     ],
                   ),
                   actions: <Widget>[
@@ -204,14 +203,11 @@ class _HomePageState extends State<HomePage> {
               },
             );
           }
+
           void playSong(SongMeta song) async {
-            await playerProvider.setUrlAndPlay(song.audioUrl!);
-            homeProvider.updateCurrentSong(Song(
-                title: song.title!,
-                imageUrl: song.imageUrl!,
-                id: song.id!,
-                duration: playerProvider.duration!));
+            await playerProvider.setUrlAndPlay(song);
           }
+
           return Scaffold(
             appBar: AppBar(
               centerTitle: false,
@@ -249,7 +245,7 @@ class _HomePageState extends State<HomePage> {
                           IconButton(
                             icon: const Icon(Icons.refresh),
                             onPressed: () {
-                              refresh(context);
+                              refresh(force: true);
                             },
                           ),
                           IconButton(
@@ -271,9 +267,13 @@ class _HomePageState extends State<HomePage> {
                                 )
                               : GestureDetector(
                                   onTap: _showUserInfoDialog,
-                                  child: CircleAvatar(
-                                    backgroundImage: NetworkImage(
-                                        userProvider.loginInfo!.avatar!),
+                                  child: Container(
+                                    width: 32,
+                                    height: 32,
+                                    child: CircleAvatar(
+                                      backgroundImage: NetworkImage(
+                                          userProvider.loginInfo!.avatar!),
+                                    ),
                                   ),
                                 ),
                         ],
@@ -286,113 +286,120 @@ class _HomePageState extends State<HomePage> {
             body: Column(
               children: [
                 Expanded(
-                    child: ListView(
-                  children: [
-                    ...homeProvider.generatingSong.map((e) {
-                      return Container(
-                        padding: const EdgeInsets.all(8),
-                        child: Row(
-                          children: [
-                            (e.imageUrl == null || e.imageUrl!.isEmpty)
-                                ? Container(
-                                    width: 72,
-                                    height: 72,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .secondaryFixedDim,
-                                  )
-                                : Image.network(e.imageUrl!,
-                                    width: 72, height: 72,
-                                    errorBuilder: (context, error, stackTrace) {
-                                    return Container(
+                    child: RefreshIndicator(
+                      onRefresh: () async {
+                        await refresh(force: true);
+                      },
+                      child: ListView(
+                                        children: [
+                      ...homeProvider.generatingSong.map((e) {
+                        return Container(
+                          padding: const EdgeInsets.all(8),
+                          child: Row(
+                            children: [
+                              (e.imageUrl == null || e.imageUrl!.isEmpty)
+                                  ? Container(
                                       width: 72,
                                       height: 72,
                                       color: Theme.of(context)
                                           .colorScheme
                                           .secondaryFixedDim,
-                                    );
-                                  }),
-                            Expanded(
-                              child: Container(
-                                height: 72,
-                                padding: const EdgeInsets.only(left: 16),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(e.title!),
-                                    LinearProgressIndicator()
-                                  ],
+                                    )
+                                  : Image.network(e.imageUrl!,
+                                      width: 72, height: 72,
+                                      errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        width: 72,
+                                        height: 72,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .secondaryFixedDim,
+                                      );
+                                    }),
+                              Expanded(
+                                child: Container(
+                                  height: 72,
+                                  padding: const EdgeInsets.only(left: 16),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(e.title!),
+                                      LinearProgressIndicator()
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }),
-                    ...homeProvider.songs.map((e) {
-                      return Container(
-                        padding: const EdgeInsets.all(8),
-                        child: Row(
-                          children: [
-                            Image.network(
-                              e.imageUrl!,
-                              width: 72,
-                              height: 72,
-                            ),
-                            Expanded(
-                              child: Container(
+                            ],
+                          ),
+                        );
+                      }),
+                      ...homeProvider.songs.map((e) {
+                        return Container(
+                          padding: const EdgeInsets.all(8),
+                          child: Row(
+                            children: [
+                              Image.network(
+                                e.imageUrl!,
+                                width: 72,
                                 height: 72,
-                                padding: const EdgeInsets.only(left: 16),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(e.title!),
-                                  ],
+                              ),
+                              Expanded(
+                                child: Container(
+                                  height: 72,
+                                  padding: const EdgeInsets.only(left: 16),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(e.title!),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(right: 8),
-                              child: IconButton(
+                              Container(
+                                margin: EdgeInsets.only(right: 8),
+                                child: IconButton(
+                                    onPressed: () {
+                                      downloadAudioFile(e.audioUrl!, e.title!);
+                                    },
+                                    icon: Icon(Icons.download)),
+                              ),
+                              IconButton(
                                   onPressed: () {
-                                    downloadAudioFile(e.audioUrl!, e.title!);
+                                    playSong(e);
                                   },
-                                  icon: Icon(Icons.download)),
-                            ),
-                            IconButton(
-                                onPressed: () {
-                                  playSong(e);
-                                },
-                                icon: Icon(Icons.play_arrow))
-                          ],
-                        ),
-                      );
-                    })
-                  ],
-                )),
+                                  icon: Icon(Icons.play_arrow))
+                            ],
+                          ),
+                        );
+                      })
+                                        ],
+                                      ),
+                    )),
                 Container(
                     height: 64,
                     padding: const EdgeInsets.only(
                         left: 16, right: 16, top: 8, bottom: 8),
                     color: Theme.of(context).colorScheme.secondaryContainer,
-                    child: homeProvider.currentSong == null
+                    child: playerProvider.currentSong == null
                         ? Container()
                         : Row(
                             children: [
-                              Image.network(
-                                homeProvider.currentSong!.imageUrl,
+                              ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  child: Image.network(
+                                playerProvider.currentSong!.imageUrl,
                                 width: 48,
                                 height: 48,
-                              ),
+                              )),
                               Expanded(
                                 child: Container(
                                   padding: const EdgeInsets.only(left: 16),
                                   child: Column(
                                     children: [
                                       Text(
-                                        homeProvider.currentSong!.title,
+                                        playerProvider.currentSong!.title,
                                       ),
                                       Row(
                                         children: [
@@ -404,32 +411,36 @@ class _HomePageState extends State<HomePage> {
                                               trackHeight: 6,
                                               // Adjust this value to make the slider track thinner
                                               thumbShape:
-                                              const RoundSliderThumbShape(
-                                                  enabledThumbRadius:
-                                                  6),
+                                                  const RoundSliderThumbShape(
+                                                      enabledThumbRadius: 6),
                                               trackShape:
-                                              RoundedRectSliderTrackShape(),
+                                                  RoundedRectSliderTrackShape(),
                                             ),
                                             child: Flexible(
                                               flex: 1,
                                               child: Container(
                                                 height: 24,
                                                 child: Slider(
-                                                  value: playerProvider.currentPosition!.inSeconds
+                                                  value: playerProvider
+                                                      .currentPosition!
+                                                      .inSeconds
                                                       .toDouble(),
                                                   onChanged: (value) {
-                                                    playerProvider.player.seek(Duration(
-                                                        seconds: value
-                                                            .toInt()));
+                                                    playerProvider.player.seek(
+                                                        Duration(
+                                                            seconds:
+                                                                value.toInt()));
                                                   },
                                                   min: 0,
-                                                  max: homeProvider.currentSong!
-                                                      .duration.inSeconds
+                                                  max: playerProvider
+                                                      .currentSong!
+                                                      .duration
+                                                      .inSeconds
                                                       .toDouble(),
-                                                  inactiveColor: Theme.of(
-                                                      context)
-                                                      .colorScheme
-                                                      .secondaryFixedDim,
+                                                  inactiveColor:
+                                                      Theme.of(context)
+                                                          .colorScheme
+                                                          .secondaryFixedDim,
                                                 ),
                                               ),
                                             ),
@@ -437,7 +448,7 @@ class _HomePageState extends State<HomePage> {
                                           Container(
                                             width: 64,
                                             child: Text(
-                                              "${homeProvider.currentSong!.duration.inMinutes}:${(homeProvider.currentSong!.duration.inSeconds % 60).toString().padLeft(2, '0')}",
+                                              "${playerProvider.currentSong!.duration.inMinutes}:${(playerProvider.currentSong!.duration.inSeconds % 60).toString().padLeft(2, '0')}",
                                               textAlign: TextAlign.left,
                                             ),
                                           ),
@@ -448,29 +459,36 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                               StreamBuilder<PlayerState>(
-                                  stream: playerProvider.player.playerStateStream,
+                                  stream:
+                                      playerProvider.player.playerStateStream,
                                   builder: (
                                     context,
                                     snapshot,
                                   ) {
+                                    final playerState = snapshot.data;
+                                    if (playerState == null) {
+                                      return Container();
+                                    }
                                     return IconButton(
                                         onPressed: () {
-                                          if (snapshot.data!.playing) {
+                                          if (playerState.playing) {
                                             playerProvider.player.pause();
                                           } else {
                                             playerProvider.player.play();
                                           }
                                         },
-                                        icon: Icon(snapshot.data!.playing
+                                        icon: Icon(playerState.playing
                                             ? Icons.pause
                                             : Icons.play_arrow));
                                   }),
                             ],
                           )),
-                Container(
-                  height: 16,
-                  color: Theme.of(context).colorScheme.secondaryContainer,
-                )
+                Platform.isAndroid
+                    ? Container(
+                        height: 16,
+                        color: Theme.of(context).colorScheme.secondaryContainer,
+                      )
+                    : Container()
               ],
             ),
           );
