@@ -41,8 +41,7 @@ class SunoClient {
       ),
     );
     if (response.statusCode == 200) {
-      token =
-          response.data['response']['sessions'][0]['last_active_token']['jwt'];
+      token = response.data['response']['sessions'][0]['last_active_token']['jwt'];
       sid = response.data['response']['last_active_session_id'];
       LoginInfo info = LoginInfo();
       if (sid != '') {
@@ -61,6 +60,7 @@ class SunoClient {
       print(response.statusMessage);
       return null;
     }
+    return null;
   }
 
   Future<String> renewToken() async {
