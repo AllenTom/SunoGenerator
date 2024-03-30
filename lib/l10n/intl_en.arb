@@ -1,0 +1,20 @@
+{
+  "UserInfo": "User Info",
+  "InputCookie": "Input cookie",
+  "InputCookieDialog_Title": "Input your cookie",
+  "Login": "Login",
+  "DownloadAudio_Hint": "Please select an output file",
+  "LoginOut": "Logout",
+  "SwitchToAccount": "Switch to",
+  "Close": "Close",
+  "OK": "OK",
+  "NewSongDialogTitle": "Create a new song",
+  "NewSongDialogCustomMode": "Custom mode",
+  "NewSongDialogLyricsHint": "Enter lyrics",
+  "NewSongDialogGenerateRandom": "Generate random",
+  "NewSongDialogStyleOfMusic": "Style of music",
+  "NewSongDialogMusicTitle": "Title",
+  "NewSongDialogPromptHint": "Enter a prompt",
+  "NewSongDialogMakeInstrumental": "make instrumental",
+  "Generate": "Generate"
+}

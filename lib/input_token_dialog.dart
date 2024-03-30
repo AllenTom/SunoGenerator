@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'generated/l10n.dart';
+
 void showCookieInputDialog(
   BuildContext context, {
   required String title,
@@ -14,17 +16,17 @@ void showCookieInputDialog(
         title: Text(title),
         content: TextField(
           controller: controller,
-          decoration: InputDecoration(hintText: "Your cookie in here"),
+          decoration: InputDecoration(hintText: S.of(context).InputCookieDialog_Title),
         ),
         actions: <Widget>[
           TextButton(
-            child: Text('Close'),
+            child: Text(S.of(context).Close),
             onPressed: () {
               Navigator.of(context).pop();
             },
           ),
           TextButton(
-            child: Text('OK'),
+            child: Text(S.of(context).OK),
             onPressed: () {
               String inputValue = controller.text;
               onOk(inputValue);

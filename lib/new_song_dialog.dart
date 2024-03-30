@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:untitled/api/client.dart';
+
+import 'generated/l10n.dart';
 
 class NewSongDialog extends StatefulWidget {
   Function(String? prompt, String? lyrics, bool isInstrumental, String? style,
@@ -39,13 +40,13 @@ class _NewSongDialogState extends State<NewSongDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Create a new song'),
+      title: Text(S.of(context).NewSongDialogTitle),
       content: SingleChildScrollView(
         child: Wrap(
           children: <Widget>[
             Container(
                 child: SwitchListTile(
-              title: const Text('Custom Mode'),
+              title: Text(S.of(context).NewSongDialogCustomMode),
               value: isCustom,
               onChanged: (bool value) {
                 setState(() {
@@ -60,7 +61,7 @@ class _NewSongDialogState extends State<NewSongDialog> {
                         padding: const EdgeInsets.only(left: 16, right: 16),
                         child: TextField(
                           decoration:
-                              InputDecoration(labelText: 'Enter lyrics'),
+                              InputDecoration(labelText: S.of(context).NewSongDialogLyricsHint),
                           minLines: 3,
                           maxLines: 100,
                           controller: lyricsController,
@@ -77,14 +78,15 @@ class _NewSongDialogState extends State<NewSongDialog> {
                             onPressed: () {
                               generateRandom();
                             },
-                            child: const Text('Generate random'),
+                            child: Text(S.of(context).NewSongDialogGenerateRandom),
                           )),
                       Container(
                         padding: const EdgeInsets.only(left: 16, right: 16),
                         margin: const EdgeInsets.only(top: 16),
                         child: TextField(
                           decoration:
-                              InputDecoration(labelText: 'Style of Music'),
+                              InputDecoration(labelText:
+                              S.of(context).NewSongDialogStyleOfMusic),
                           onChanged: (value) {
                             style = value;
                           },
@@ -95,7 +97,7 @@ class _NewSongDialogState extends State<NewSongDialog> {
                         margin: const EdgeInsets.only(top: 16),
                         child: TextField(
                           controller: titleController,
-                          decoration: InputDecoration(labelText: 'Title'),
+                          decoration: InputDecoration(labelText: S.of(context).NewSongDialogMusicTitle),
                           onChanged: (value) {
                             title = value;
                           },
@@ -106,7 +108,7 @@ class _NewSongDialogState extends State<NewSongDialog> {
                 : Container(
                     padding: const EdgeInsets.only(left: 16, right: 16),
                     child: TextField(
-                      decoration: InputDecoration(labelText: 'Enter a prompt'),
+                      decoration: InputDecoration(labelText: S.of(context).NewSongDialogPromptHint),
                       minLines: 3,
                       maxLines: 100,
                       onChanged: (value) {
@@ -117,7 +119,7 @@ class _NewSongDialogState extends State<NewSongDialog> {
             Container(
                 margin: const EdgeInsets.only(top: 16),
                 child: SwitchListTile(
-                  title: const Text('make instrumental'),
+                  title: Text(S.of(context).NewSongDialogMakeInstrumental),
                   value: isInstrumental,
                   onChanged: (bool value) {
                     setState(() {
@@ -133,14 +135,14 @@ class _NewSongDialogState extends State<NewSongDialog> {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: const Text('Cancel'),
+          child: Text(S.of(context).Close),
         ),
         TextButton(
           onPressed: () {
             Navigator.of(context).pop();
             widget.onGenerate(prompt, lyrics, isInstrumental, style, title);
           },
-          child: const Text('Generate'),
+          child: Text(S.of(context).Generate),
         )
       ],
     );

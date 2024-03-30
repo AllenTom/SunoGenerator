@@ -1,0 +1,20 @@
+{
+  "userInfo": "用户信息",
+  "InputCookie": "输入Cookie",
+  "InputCookieDialog_Title": "输入Cookie",
+  "Login": "登录",
+  "DownloadAudio_Hint": "请选择输出文件",
+  "LoginOut": "登出",
+  "SwitchToAccount": "切换至",
+  "Close": "关闭",
+  "OK": "确认",
+  "NewSongDialogTitle": "新建歌曲",
+  "NewSongDialogCustomMode": "自定义模式",
+  "NewSongDialogLyricsHint": "请输入歌词",
+  "NewSongDialogGenerateRandom": "随机生成",
+  "NewSongDialogStyleOfMusic": "风格",
+  "NewSongDialogMusicTitle": "标题",
+  "NewSongDialogPromptHint": "输入提示词",
+  "NewSongDialogMakeInstrumental": "仅乐器",
+  "Generate": "生成"
+}

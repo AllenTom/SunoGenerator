@@ -14,6 +14,7 @@ import 'package:untitled/store.dart';
 
 import '../../api/client.dart';
 import '../../api/entity.dart';
+import '../../generated/l10n.dart';
 import '../../input_token_dialog.dart';
 import '../../user_provider.dart';
 
@@ -47,7 +48,7 @@ class _HomePageState extends State<HomePage> {
       Uint8List raw = await client.downloadFileWithUrl(fileUrl);
       print(raw);
       String? outputFile = await FilePicker.platform.saveFile(
-        dialogTitle: 'Please select an output file:',
+        dialogTitle:S.of(context).InputCookieDialog_Title,
         fileName: '$title.mp3',
         type: FileType.audio,
         bytes: raw,
@@ -113,7 +114,7 @@ class _HomePageState extends State<HomePage> {
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
-                  title: const Text('User Info'),
+                  title: Text(S.of(context).UserInfo),
                   content: Wrap(
                     children: <Widget>[
                       Container(
@@ -142,7 +143,7 @@ class _HomePageState extends State<HomePage> {
                               userProvider.loginOut();
                               onLoginOut(context);
                             },
-                            child: Text("Login out")),
+                            child: Text(S.of(context).LoginOut)),
                       ),
                       Divider(),
                       AppDataStore().config.users.where((element) {
@@ -153,7 +154,7 @@ class _HomePageState extends State<HomePage> {
                                 Container(
                                     margin: const EdgeInsets.only(
                                         bottom: 16, top: 16),
-                                    child: Text("switch to")),
+                                    child: Text(S.of(context).SwitchToAccount)),
                                 ...AppDataStore().config.users.where((element) {
                                   return element.id !=
                                       userProvider.loginInfo!.id;
@@ -196,7 +197,7 @@ class _HomePageState extends State<HomePage> {
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: const Text('Close'),
+                      child: Text(S.of(context).Close),
                     ),
                   ],
                 );
@@ -226,28 +227,22 @@ class _HomePageState extends State<HomePage> {
                                   );
                                   await onLogin(result);
                                 },
-                                child: Text("Login"))
+                                child: Text(S.of(context).Login))
                             : Container(),
                         Container(
                           child: TextButton(
                               onPressed: () {
                                 showCookieInputDialog(context,
-                                    title: "Input your cookie",
+                                    title: S.of(context).InputCookieDialog_Title,
                                     onOk: (cookieString) async {
                                   await onLogin(cookieString);
                                 });
                               },
-                              child: Text("Input cookie")),
+                              child: Text(S.of(context).InputCookie)),
                         )
                       ])
                     : Row(
                         children: [
-                          IconButton(
-                            icon: const Icon(Icons.refresh),
-                            onPressed: () {
-                              refresh(force: true);
-                            },
-                          ),
                           IconButton(
                             icon: const Icon(Icons.add),
                             onPressed: () {
