@@ -44,6 +44,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "NewSongDialogStyleOfMusic": MessageLookupByLibrary.simpleMessage("风格"),
         "NewSongDialogTitle": MessageLookupByLibrary.simpleMessage("新建歌曲"),
         "OK": MessageLookupByLibrary.simpleMessage("确认"),
-        "SwitchToAccount": MessageLookupByLibrary.simpleMessage("切换至")
+        "SwitchToAccount": MessageLookupByLibrary.simpleMessage("切换至"),
+        "UserInfo": MessageLookupByLibrary.simpleMessage("用户信息")
       };
 }

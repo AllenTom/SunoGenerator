@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 import 'package:untitled/login.dart';
@@ -17,6 +19,7 @@ import '../../api/entity.dart';
 import '../../generated/l10n.dart';
 import '../../input_token_dialog.dart';
 import '../../user_provider.dart';
+import '../player/player.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -41,14 +44,12 @@ class Song {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-
-
     downloadAudioFile(String fileUrl, String title) async {
       SunoClient client = SunoClient();
       Uint8List raw = await client.downloadFileWithUrl(fileUrl);
       print(raw);
       String? outputFile = await FilePicker.platform.saveFile(
-        dialogTitle:S.of(context).InputCookieDialog_Title,
+        dialogTitle: S.of(context).InputCookieDialog_Title,
         fileName: '$title.mp3',
         type: FileType.audio,
         bytes: raw,
@@ -76,8 +77,10 @@ class _HomePageState extends State<HomePage> {
 
           initData();
 
-          void generateSong(String? prompt,String? lyrics, bool isInstrumental,String? style,String? title) async {
-            homeProvider.generateSong(prompt, lyrics, isInstrumental, style, title);
+          void generateSong(String? prompt, String? lyrics, bool isInstrumental,
+              String? style, String? title) async {
+            homeProvider.generateSong(
+                prompt, lyrics, isInstrumental, style, title);
           }
 
           Future<void> refresh({bool force = false}) async {
@@ -90,7 +93,8 @@ class _HomePageState extends State<HomePage> {
                 builder: (context) {
                   return NewSongDialog(
                     onGenerate: (prompt, lyrics, isInstrumental, style, title) {
-                      generateSong(prompt, lyrics, isInstrumental, style, title);
+                      generateSong(
+                          prompt, lyrics, isInstrumental, style, title);
                     },
                   );
                 });
@@ -125,13 +129,24 @@ class _HomePageState extends State<HomePage> {
                               margin: const EdgeInsets.only(right: 16),
                               width: 64,
                               height: 64,
-                              child: CircleAvatar(
-                                backgroundImage: NetworkImage(
-                                    userProvider.loginInfo!.avatar!),
-                              ),
+                              child: Builder(builder: (context) {
+                                final avatar = userProvider.loginInfo?.avatar;
+                                if (avatar == null || avatar.isEmpty) {
+                                  return Container(
+                                    width: 64,
+                                    height: 64,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondaryFixedDim,
+                                  );
+                                }
+                                return CircleAvatar(
+                                  backgroundImage: NetworkImage(avatar),
+                                );
+                              }),
                             ),
                             Text(
-                                "${userProvider.loginInfo!.firstName} ${userProvider.loginInfo!.lastName}")
+                                "${userProvider.loginInfo?.firstName} ${userProvider.loginInfo?.lastName}")
                           ],
                         ),
                       ),
@@ -145,9 +160,9 @@ class _HomePageState extends State<HomePage> {
                             },
                             child: Text(S.of(context).LoginOut)),
                       ),
-                      Divider(),
+                      const Divider(),
                       AppDataStore().config.users.where((element) {
-                        return element.id != userProvider.loginInfo!.id;
+                        return element.id != userProvider.loginInfo?.id;
                       }).isNotEmpty
                           ? Column(
                               children: [
@@ -157,7 +172,7 @@ class _HomePageState extends State<HomePage> {
                                     child: Text(S.of(context).SwitchToAccount)),
                                 ...AppDataStore().config.users.where((element) {
                                   return element.id !=
-                                      userProvider.loginInfo!.id;
+                                      userProvider.loginInfo?.id;
                                 }).map((user) {
                                   return GestureDetector(
                                     onTap: () async {
@@ -169,15 +184,30 @@ class _HomePageState extends State<HomePage> {
                                       width: double.infinity,
                                       child: Row(
                                         children: [
-                                          Container(
-                                            margin: const EdgeInsets.only(
-                                                right: 16),
-                                            width: 48,
-                                            height: 48,
-                                            child: CircleAvatar(
-                                              backgroundImage:
-                                                  NetworkImage(user.avatar!),
-                                            ),
+
+                                          Builder(
+                                            builder: (context) {
+                                              final avatar = user.avatar;
+                                              if (avatar == null) {
+                                                return Container(
+                                                  width: 48,
+                                                  height: 48,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .secondaryFixedDim,
+                                                );
+                                              }
+                                              return Container(
+                                                margin: const EdgeInsets.only(
+                                                    right: 16),
+                                                width: 48,
+                                                height: 48,
+                                                child: CircleAvatar(
+                                                  backgroundImage:
+                                                      NetworkImage(avatar),
+                                                ),
+                                              );
+                                            }
                                           ),
                                           Expanded(
                                               child: Text(
@@ -206,7 +236,8 @@ class _HomePageState extends State<HomePage> {
           }
 
           void playSong(SongMeta song) async {
-            await playerProvider.setUrlAndPlay(song);
+            await playerProvider.playSongs([song]);
+            // await playerProvider.setUrlAndPlay(song);
           }
 
           return Scaffold(
@@ -233,7 +264,8 @@ class _HomePageState extends State<HomePage> {
                           child: TextButton(
                               onPressed: () {
                                 showCookieInputDialog(context,
-                                    title: S.of(context).InputCookieDialog_Title,
+                                    title:
+                                        S.of(context).InputCookieDialog_Title,
                                     onOk: (cookieString) async {
                                   await onLogin(cookieString);
                                 });
@@ -244,7 +276,14 @@ class _HomePageState extends State<HomePage> {
                     : Row(
                         children: [
                           IconButton(
-                            icon: const Icon(Icons.add),
+                            icon: const Icon(Icons.playlist_play_rounded),
+                            onPressed: () async {
+                              await playerProvider
+                                  .playSongs(homeProvider.songs);
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.add_rounded),
                             onPressed: () {
                               openNewSongDialog();
                             },
@@ -262,13 +301,30 @@ class _HomePageState extends State<HomePage> {
                                 )
                               : GestureDetector(
                                   onTap: _showUserInfoDialog,
-                                  child: Container(
-                                    width: 32,
-                                    height: 32,
-                                    child: CircleAvatar(
-                                      backgroundImage: NetworkImage(
-                                          userProvider.loginInfo!.avatar!),
-                                    ),
+                                  child: Builder(
+                                    builder: (context) {
+                                      if (userProvider.loginInfo == null) {
+                                        return Container();
+                                      }
+                                      final avatar = userProvider.loginInfo?.avatar;
+                                      if (avatar == null || avatar.isEmpty) {
+                                        return Container(
+                                          width: 32,
+                                          height: 32,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .secondaryFixedDim,
+                                        );
+                                      }
+                                      return Container(
+                                        width: 32,
+                                        height: 32,
+                                        child: CircleAvatar(
+                                          backgroundImage: NetworkImage(
+                                              avatar),
+                                        ),
+                                      );
+                                    }
                                   ),
                                 ),
                         ],
@@ -282,45 +338,50 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Expanded(
                     child: RefreshIndicator(
-                      onRefresh: () async {
-                        await refresh(force: true);
-                      },
-                      child: ListView(
-                                        children: [
+                  onRefresh: () async {
+                    await refresh(force: true);
+                  },
+                  child: ListView(
+                    children: [
                       ...homeProvider.generatingSong.map((e) {
                         return Container(
                           padding: const EdgeInsets.all(8),
                           child: Row(
                             children: [
-                              (e.imageUrl == null || e.imageUrl!.isEmpty)
-                                  ? Container(
+                              Builder(builder: (context) {
+                                final image = e.imageUrl;
+                                if (image == null || image.isEmpty) {
+                                  return ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: Container(
                                       width: 72,
                                       height: 72,
                                       color: Theme.of(context)
                                           .colorScheme
                                           .secondaryFixedDim,
-                                    )
-                                  : Image.network(e.imageUrl!,
-                                      width: 72, height: 72,
-                                      errorBuilder: (context, error, stackTrace) {
-                                      return Container(
-                                        width: 72,
-                                        height: 72,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .secondaryFixedDim,
-                                      );
-                                    }),
+                                    ),
+                                  );
+                                }
+                                return ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  child: Image.network(
+                                    image,
+                                    width: 72,
+                                    height: 72,
+                                  ),
+                                );
+                              }),
                               Expanded(
                                 child: Container(
                                   height: 72,
                                   padding: const EdgeInsets.only(left: 16),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(e.title!),
-                                      LinearProgressIndicator()
+                                      const LinearProgressIndicator()
                                     ],
                                   ),
                                 ),
@@ -334,44 +395,74 @@ class _HomePageState extends State<HomePage> {
                           padding: const EdgeInsets.all(8),
                           child: Row(
                             children: [
-                              Image.network(
-                                e.imageUrl!,
-                                width: 72,
-                                height: 72,
-                              ),
+                              Builder(builder: (context) {
+                                final image = e.imageUrl;
+                                if (image == null || image.isEmpty) {
+                                  return ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: Container(
+                                      width: 72,
+                                      height: 72,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondaryFixedDim,
+                                    ),
+                                  );
+                                }
+                                return ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  child: Image.network(
+                                    image,
+                                    width: 72,
+                                    height: 72,
+                                  ),
+                                );
+                              }),
                               Expanded(
                                 child: Container(
                                   height: 72,
                                   padding: const EdgeInsets.only(left: 16),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Text(e.title!),
+                                      Text(e.title ?? ""),
                                     ],
                                   ),
                                 ),
                               ),
-                              Container(
-                                margin: EdgeInsets.only(right: 8),
-                                child: IconButton(
-                                    onPressed: () {
-                                      downloadAudioFile(e.audioUrl!, e.title!);
-                                    },
-                                    icon: Icon(Icons.download)),
-                              ),
+                              Builder(builder: (context) {
+                                final audioUrl = e.audioUrl;
+                                final audioTitle = e.title;
+                                if (!e.hasMp3Url() ||
+                                    audioUrl == null ||
+                                    audioTitle == null) {
+                                  return Container();
+                                }
+                                return Container(
+                                  margin: const EdgeInsets.only(right: 8),
+                                  child: IconButton(
+                                      onPressed: () {
+                                        downloadAudioFile(audioUrl, audioTitle);
+                                      },
+                                      icon: const Icon(Icons.download_rounded)),
+                                );
+                              }),
                               IconButton(
                                   onPressed: () {
                                     playSong(e);
                                   },
-                                  icon: Icon(Icons.play_arrow))
+                                  icon: const Icon(Icons.play_arrow_rounded)
+                              ),
+
                             ],
                           ),
                         );
                       })
-                                        ],
-                                      ),
-                    )),
+                    ],
+                  ),
+                )),
                 Container(
                     height: 64,
                     padding: const EdgeInsets.only(
@@ -381,73 +472,50 @@ class _HomePageState extends State<HomePage> {
                         ? Container()
                         : Row(
                             children: [
-                              ClipRRect(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  child: Image.network(
-                                playerProvider.currentSong!.imageUrl,
-                                width: 48,
-                                height: 48,
-                              )),
+                              GestureDetector(
+                                onTap: () {
+                                  // go to player
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const PlayerScreen()),
+                                  );
+                                },
+                                child: Builder(builder: (context) {
+                                  final imageUrl =
+                                      playerProvider.currentSong?.imageUrl;
+                                  if (imageUrl == null || imageUrl.isEmpty) {
+                                    return ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      child: Container(
+                                        width: 48,
+                                        height: 48,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .secondaryFixedDim,
+                                      ),
+                                    );
+                                  }
+                                  return ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      child: Image.network(
+                                        imageUrl,
+                                        width: 48,
+                                        height: 48,
+                                      ));
+                                }),
+                              ),
                               Expanded(
                                 child: Container(
                                   padding: const EdgeInsets.only(left: 16),
                                   child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        playerProvider.currentSong!.title,
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text(
-                                              "${playerProvider.currentPosition!.inMinutes}:${(playerProvider.currentPosition!.inSeconds % 60).toString().padLeft(2, '0')}"),
-                                          SliderTheme(
-                                            data: SliderTheme.of(context)
-                                                .copyWith(
-                                              trackHeight: 6,
-                                              // Adjust this value to make the slider track thinner
-                                              thumbShape:
-                                                  const RoundSliderThumbShape(
-                                                      enabledThumbRadius: 6),
-                                              trackShape:
-                                                  RoundedRectSliderTrackShape(),
-                                            ),
-                                            child: Flexible(
-                                              flex: 1,
-                                              child: Container(
-                                                height: 24,
-                                                child: Slider(
-                                                  value: playerProvider
-                                                      .currentPosition!
-                                                      .inSeconds
-                                                      .toDouble(),
-                                                  onChanged: (value) {
-                                                    playerProvider.player.seek(
-                                                        Duration(
-                                                            seconds:
-                                                                value.toInt()));
-                                                  },
-                                                  min: 0,
-                                                  max: playerProvider
-                                                      .currentSong!
-                                                      .duration
-                                                      .inSeconds
-                                                      .toDouble(),
-                                                  inactiveColor:
-                                                      Theme.of(context)
-                                                          .colorScheme
-                                                          .secondaryFixedDim,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Container(
-                                            width: 64,
-                                            child: Text(
-                                              "${playerProvider.currentSong!.duration.inMinutes}:${(playerProvider.currentSong!.duration.inSeconds % 60).toString().padLeft(2, '0')}",
-                                              textAlign: TextAlign.left,
-                                            ),
-                                          ),
-                                        ],
+                                        playerProvider.currentSong?.title ?? "",
                                       ),
                                     ],
                                   ),
@@ -473,8 +541,8 @@ class _HomePageState extends State<HomePage> {
                                           }
                                         },
                                         icon: Icon(playerState.playing
-                                            ? Icons.pause
-                                            : Icons.play_arrow));
+                                            ? Icons.pause_rounded
+                                            : Icons.play_arrow_rounded));
                                   }),
                             ],
                           )),

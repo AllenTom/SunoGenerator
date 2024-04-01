@@ -24,20 +24,7 @@ class SunoClient {
   }
 
   SunoClient._internal() {
-    dio.httpClientAdapter = IOHttpClientAdapter(
-      createHttpClient: () {
-        final client = HttpClient();
-        client.findProxy = (uri) {
-          // Proxy all request to localhost:8888.
-          // Be aware, the proxy should went through you running device,
-          // not the host platform.
-          return 'PROXY localhost:7890';
-        };
-        client.badCertificateCallback =
-            (X509Certificate cert, String host, int port) => true;
-        return client;
-      },
-    );
+
   }
 
   void applyCookie(String cookieString) {

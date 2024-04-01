@@ -23,18 +23,35 @@ class _NewSongDialogState extends State<NewSongDialog> {
   bool isCustom = false;
   TextEditingController lyricsController = TextEditingController();
   TextEditingController titleController = TextEditingController();
+  bool isGenerationLyrics = false;
 
   generateRandom() async {
-    final result = await client.generateRandomLyrics();
-    if (result == null) {
+    if (isGenerationLyrics) {
       return;
     }
     setState(() {
-      lyrics = result.text;
-      title = result.title;
+      isGenerationLyrics = true;
     });
-    lyricsController.text = result.text ?? lyricsController.text;
-    titleController.text = result.title ?? titleController.text;
+    try {
+      final result = await client.generateRandomLyrics();
+      if (result == null) {
+        return;
+      }
+      setState(() {
+        lyrics = result.text;
+        title = result.title;
+      });
+      lyricsController.text = result.text ?? lyricsController.text;
+      titleController.text = result.title ?? titleController.text;
+    }catch(e){
+      print(e);
+    }finally{
+      setState(() {
+        isGenerationLyrics = false;
+      });
+    }
+
+
   }
 
   @override
@@ -75,9 +92,7 @@ class _NewSongDialogState extends State<NewSongDialog> {
                           padding: const EdgeInsets.only(left: 16, right: 16),
                           margin: const EdgeInsets.only(top: 16),
                           child: TextButton(
-                            onPressed: () {
-                              generateRandom();
-                            },
+                            onPressed:  isGenerationLyrics ? null : generateRandom,
                             child: Text(S.of(context).NewSongDialogGenerateRandom),
                           )),
                       Container(

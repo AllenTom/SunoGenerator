@@ -9,7 +9,7 @@ class PlayerProvider extends ChangeNotifier {
   Duration? duration;
   Duration? currentPosition;
   PlayerState? playerState;
-  Song? currentSong;
+  SongMeta? currentSong;
 
   PlayerProvider() {
     player.positionStream.listen((event) {
@@ -20,6 +20,20 @@ class PlayerProvider extends ChangeNotifier {
       playerState = event;
       notifyListeners();
     });
+    player.sequenceStateStream.listen((event) {
+      if (event != null) {
+        SongMeta? meta = event.currentSource!.tag as SongMeta?;
+        if (meta != null) {
+          currentSong = meta;
+          notifyListeners();
+        }
+      }
+    });
+    player.durationStream.listen((event) {
+      duration = event;
+      notifyListeners();
+    });
+
   }
 
   disposePlayer() async {
@@ -32,12 +46,27 @@ class PlayerProvider extends ChangeNotifier {
       return;
     }
     duration = await player.setUrl(url);
-    currentSong = Song(
-        id: songMeta.id!,
-        title: songMeta.title!,
-        imageUrl: songMeta.imageUrl!,
-        duration: duration!);
     await player.play();
     notifyListeners();
+  }
+
+  playSongs(List<SongMeta> songs) async {
+    List<AudioSource> audioSources = [];
+    for (var song in songs) {
+      audioSources.add(
+          AudioSource.uri(
+              Uri.parse(song.audioUrl!),
+              tag: song
+          )
+      );
+    }
+    final playlist = ConcatenatingAudioSource(
+      // Start loading next item just before reaching it
+      useLazyPreparation: true,
+      // Specify the playlist items
+      children: audioSources,
+    );
+    await player.setAudioSource(playlist,initialIndex: 0, initialPosition: Duration.zero);
+    await player.play();
   }
 }
