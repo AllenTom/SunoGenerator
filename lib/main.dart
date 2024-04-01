@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
       supportedLocales: S.delegate.supportedLocales,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal,brightness: Brightness.light),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal,brightness: Brightness.dark),
         useMaterial3: true,
       ),
       home: const MyHomePage(),
@@ -64,6 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+
     return FutureBuilder(
       future: initApp(),
       builder: (context, snapshot) {

@@ -12,7 +12,7 @@ class IndexPage extends StatefulWidget {
 }
 
 class _IndexPageState extends State<IndexPage> {
-  int _currentIndex = 1;
+  int _currentIndex = 0;
   final List<Widget> _children = [
     HomePage(),
     ExplorePage()

@@ -59,9 +59,9 @@ class _HomePageState extends State<HomePage> {
 
     return Consumer3<UserProvider, HomeProvider, PlayerProvider>(
         builder: (context, userProvider, homeProvider, playerProvider, _) {
-      initData() async {
+      initData({bool force = false}) async {
         SunoClient client = SunoClient();
-        if (homeProvider.isFirst) {
+        if (homeProvider.isFirst || force) {
           final providerUser = Provider.of<UserProvider>(context);
           if (providerUser.loginInfo == null && client.cookie.isNotEmpty) {
             await providerUser.loginUser(client.cookie);
@@ -96,7 +96,7 @@ class _HomePageState extends State<HomePage> {
       Future<void> onLogin(String cookieString) async {
         SunoClient client = SunoClient();
         client.applyCookie(cookieString);
-        initData();
+        initData(force: true);
         await refresh();
       }
 

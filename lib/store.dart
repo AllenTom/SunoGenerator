@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'api/entity.dart';
+
 class User {
   String id;
   String? firstName;
@@ -64,9 +66,32 @@ class AppConfig {
   }
 }
 
+class PlaylistHistory {
+  List<SongMeta> songs = [];
+  addSong(SongMeta song) {
+    songs = songs.where((s) => s.id != song.id).toList();
+    songs.insert(0, song);
+  }
+  setSongs(List<SongMeta> songs) {
+    this.songs = songs;
+  }
+
+  static fromJson(List<dynamic> json) {
+    PlaylistHistory history = PlaylistHistory();
+    for (var song in json) {
+      history.songs.add(SongMeta.fromJson(song));
+    }
+    return history;
+  }
+  List<dynamic> toJson() {
+    return songs.map((song) => song.toJson()).toList();
+  }
+}
+
 class AppDataStore {
   static const String CONFIG_STORE_KEY = 'app_config';
   late AppConfig config;
+  late PlaylistHistory playlistHistory;
   static final AppDataStore _instance = AppDataStore._internal();
 
   factory AppDataStore() {
@@ -84,6 +109,11 @@ class AppDataStore {
     final String configString = prefs.getString(CONFIG_STORE_KEY)!;
     final raw = jsonDecode(configString);
     config = AppConfig.fromJson(raw);
+
+    if (!prefs.containsKey('playlist_history')) {
+      var historyRaw = jsonDecode(prefs.getString('playlist_history')!);
+      playlistHistory = PlaylistHistory.fromJson(historyRaw);
+    }
   }
 
   save() async {
@@ -101,5 +131,15 @@ class AppDataStore {
       return null;
     }
     return config.users[0];
+  }
+
+  addSongToHistory(SongMeta song) async {
+    playlistHistory.addSong(song);
+    await saveHistory();
+  }
+  saveHistory() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String historyString = jsonEncode(playlistHistory.toJson());
+    prefs.setString('playlist_history', historyString);
   }
 }
