@@ -22,7 +22,7 @@ class _PlayBarState extends State<PlayBar> {
             context: context,
             builder: (context) {
               return Container(
-                color: Theme.of(context).colorScheme.secondaryContainer,
+                color: Theme.of(context).colorScheme.surface,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,11 +106,22 @@ class _PlayBarState extends State<PlayBar> {
 
       return Container(
           height: 64,
+          width: double.infinity,
+          decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              border: Border(
+                  top: BorderSide(
+                      color: Theme.of(context).colorScheme.secondaryFixedDim.withAlpha(20),
+                      width: 1),
+              ),
+
+          ),
           padding:
               const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
-          color: Theme.of(context).colorScheme.secondaryContainer,
           child: playerProvider.currentSong == null
-              ? Container()
+              ? Container(
+            child: Center(child: const Text("No song playing")),
+          )
               : Row(
                   children: [
                     GestureDetector(

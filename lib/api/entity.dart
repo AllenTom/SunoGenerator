@@ -162,4 +162,91 @@ class GenerateLyricsResult {
     data['status'] = status;
     return data;
   }
+
+}
+
+class SunoPlaylist {
+  String? id;
+  List<PlaylistClips>? playlistClips;
+  String? imageUrl;
+  int? numTotalResults;
+  int? currentPage;
+  bool? isOwned;
+  bool? isTrashed;
+  String? name;
+  String? description;
+  bool? isPublic;
+
+  SunoPlaylist(
+      {this.id,
+        this.playlistClips,
+        this.imageUrl,
+        this.numTotalResults,
+        this.currentPage,
+        this.isOwned,
+        this.isTrashed,
+        this.name,
+        this.description,
+        this.isPublic,
+      });
+
+  SunoPlaylist.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    if (json['playlist_clips'] != null) {
+      playlistClips = <PlaylistClips>[];
+      json['playlist_clips'].forEach((v) {
+        playlistClips!.add(new PlaylistClips.fromJson(v));
+      });
+    }
+    imageUrl = json['image_url'];
+    numTotalResults = json['num_total_results'];
+    currentPage = json['current_page'];
+    isOwned = json['is_owned'];
+    isTrashed = json['is_trashed'];
+    name = json['name'];
+    description = json['description'];
+    isPublic = json['is_public'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = id;
+    if (playlistClips != null) {
+      data['playlist_clips'] =
+          playlistClips!.map((v) => v.toJson()).toList();
+    }
+    data['image_url'] = imageUrl;
+    data['num_total_results'] = numTotalResults;
+    data['current_page'] = currentPage;
+    data['is_owned'] = isOwned;
+    data['is_trashed'] = isTrashed;
+    data['name'] = name;
+    data['description'] = description;
+    data['is_public'] = isPublic;
+    return data;
+  }
+}
+
+class PlaylistClips {
+  SongMeta? clip;
+  double? relativeIndex;
+  String? updatedAt;
+
+  PlaylistClips({this.clip, this.relativeIndex, this.updatedAt});
+
+  PlaylistClips.fromJson(Map<String, dynamic> json) {
+    clip = json['clip'] != null ? new SongMeta.fromJson(json['clip']) : null;
+    relativeIndex = json['relative_index'];
+    updatedAt = json['updated_at'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    if (clip != null) {
+      data['clip'] = clip!.toJson();
+    }
+    data['relative_index'] = relativeIndex;
+    data['updated_at'] = updatedAt;
+    return data;
+  }
 }

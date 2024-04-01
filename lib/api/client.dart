@@ -263,17 +263,32 @@ class SunoClient {
 
   Future deleteSongs(List<String> ids) async {
     await renewToken();
-    var response = await dio.request('https://studio-api.suno.ai/api/gen/trash/',
-        data: {"clip_ids": ids, "trash": true},
-        options: Options(
-          method: 'POST',
-          headers: {
-            'Cookie': cookie,
-            'User-Agent': ua,
-            'Accept': 'application/json',
-            'Authorization': 'Bearer $token'
-          },
-        ));
+    var response =
+        await dio.request('https://studio-api.suno.ai/api/gen/trash/',
+            data: {"clip_ids": ids, "trash": true},
+            options: Options(
+              method: 'POST',
+              headers: {
+                'Cookie': cookie,
+                'User-Agent': ua,
+                'Accept': 'application/json',
+                'Authorization': 'Bearer $token'
+              },
+            ));
     return response.data;
+  }
+
+  Future<SunoPlaylist> getPlaylist({required String id, int page = 1}) async {
+    await renewToken();
+    var response =
+        await dio.request('https://studio-api.suno.ai/api/playlist/$id/',
+            queryParameters: {"page": page},
+            options: Options(method: 'GET', headers: {
+              'Cookie': cookie,
+              'User-Agent': ua,
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $token'
+            }));
+    return SunoPlaylist.fromJson(response.data);
   }
 }

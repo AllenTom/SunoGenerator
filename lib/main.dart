@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:untitled/api/client.dart';
 import 'package:untitled/player_provider.dart';
 import 'package:untitled/screens/home/home.dart';
+import 'package:untitled/screens/index.dart';
 import 'package:untitled/store.dart';
 import 'package:untitled/user_provider.dart';
 
@@ -36,7 +37,7 @@ class MyApp extends StatelessWidget {
       supportedLocales: S.delegate.supportedLocales,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal,brightness: Brightness.light),
         useMaterial3: true,
       ),
       home: const MyHomePage(),
@@ -67,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
       future: initApp(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          return HomePage();
+          return IndexPage();
         }
         return Container();
       },
