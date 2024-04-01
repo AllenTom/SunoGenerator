@@ -27,7 +27,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
           ),
         ),
         body: Stack(
-
           children: [
             Image.network(
               playerProvider.currentSong?.imageUrl ?? "",

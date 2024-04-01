@@ -10,7 +10,8 @@ class PlayerProvider extends ChangeNotifier {
   Duration? currentPosition;
   PlayerState? playerState;
   SongMeta? currentSong;
-
+  ConcatenatingAudioSource? playlist;
+  SequenceState? sequenceState;
   PlayerProvider() {
     player.positionStream.listen((event) {
       currentPosition = event;
@@ -33,21 +34,14 @@ class PlayerProvider extends ChangeNotifier {
       duration = event;
       notifyListeners();
     });
-
+    player.sequenceStateStream.listen((event) {
+      sequenceState = event;
+      notifyListeners();
+    });
   }
 
   disposePlayer() async {
     await player.dispose();
-  }
-
-  setUrlAndPlay(SongMeta songMeta) async {
-    final url = songMeta.audioUrl;
-    if (url == null) {
-      return;
-    }
-    duration = await player.setUrl(url);
-    await player.play();
-    notifyListeners();
   }
 
   playSongs(List<SongMeta> songs) async {
@@ -60,13 +54,34 @@ class PlayerProvider extends ChangeNotifier {
           )
       );
     }
-    final playlist = ConcatenatingAudioSource(
+    playlist = ConcatenatingAudioSource(
       // Start loading next item just before reaching it
       useLazyPreparation: true,
       // Specify the playlist items
       children: audioSources,
     );
-    await player.setAudioSource(playlist,initialIndex: 0, initialPosition: Duration.zero);
+    await player.setAudioSource(playlist!,initialIndex: 0, initialPosition: Duration.zero);
     await player.play();
+  }
+
+  addToQueue(SongMeta songMeta) async {
+    final url = songMeta.audioUrl;
+    if (url == null) {
+      return;
+    }
+    if (playlist != null) {
+      final currentIndex = player.currentIndex;
+      if (currentIndex == null) {
+        return;
+      }
+      playlist!.insert(currentIndex + 1, AudioSource.uri(Uri.parse(url), tag: songMeta));
+      return;
+    }
+    notifyListeners();
+  }
+  seekQueue(int index) async {
+    if (playlist != null) {
+      await player.seek(Duration.zero, index: index);
+    }
   }
 }

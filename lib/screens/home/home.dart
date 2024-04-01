@@ -10,6 +10,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 import 'package:untitled/login.dart';
 import 'package:untitled/new_song_dialog.dart';
+import 'package:untitled/play_bar.dart';
 import 'package:untitled/player_provider.dart';
 import 'package:untitled/screens/home/provider.dart';
 import 'package:untitled/store.dart';
@@ -19,6 +20,7 @@ import '../../api/entity.dart';
 import '../../generated/l10n.dart';
 import '../../input_token_dialog.dart';
 import '../../user_provider.dart';
+import '../detail/song_detail.dart';
 import '../player/player.dart';
 
 class HomePage extends StatefulWidget {
@@ -47,7 +49,6 @@ class _HomePageState extends State<HomePage> {
     downloadAudioFile(String fileUrl, String title) async {
       SunoClient client = SunoClient();
       Uint8List raw = await client.downloadFileWithUrl(fileUrl);
-      print(raw);
       String? outputFile = await FilePicker.platform.saveFile(
         dialogTitle: S.of(context).InputCookieDialog_Title,
         fileName: '$title.mp3',
@@ -111,6 +112,9 @@ class _HomePageState extends State<HomePage> {
             await playerProvider.disposePlayer();
             userProvider.loginOut();
             homeProvider.toInit();
+          }
+          Future onDeleteSong(String id) async {
+            await homeProvider.deleteSong(id);
           }
 
           void _showUserInfoDialog() {
@@ -397,24 +401,39 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               Builder(builder: (context) {
                                 final image = e.imageUrl;
+                                goToDetail(){
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => SongDetail(meta: e)),
+                                  );
+                                }
                                 if (image == null || image.isEmpty) {
-                                  return ClipRRect(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    child: Container(
-                                      width: 72,
-                                      height: 72,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .secondaryFixedDim,
+                                  return GestureDetector(
+                                    onTap: goToDetail,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      child: Container(
+                                        width: 72,
+                                        height: 72,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .secondaryFixedDim,
+                                      ),
                                     ),
                                   );
                                 }
-                                return ClipRRect(
-                                  borderRadius: BorderRadius.circular(8.0),
-                                  child: Image.network(
-                                    image,
-                                    width: 72,
-                                    height: 72,
+                                return GestureDetector(
+                                  onTap: () {
+                                    goToDetail();
+                                  },
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: Image.network(
+                                      image,
+                                      width: 72,
+                                      height: 72,
+                                    ),
                                   ),
                                 );
                               }),
@@ -432,30 +451,56 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                 ),
                               ),
-                              Builder(builder: (context) {
-                                final audioUrl = e.audioUrl;
-                                final audioTitle = e.title;
-                                if (!e.hasMp3Url() ||
-                                    audioUrl == null ||
-                                    audioTitle == null) {
-                                  return Container();
-                                }
-                                return Container(
-                                  margin: const EdgeInsets.only(right: 8),
-                                  child: IconButton(
-                                      onPressed: () {
-                                        downloadAudioFile(audioUrl, audioTitle);
-                                      },
-                                      icon: const Icon(Icons.download_rounded)),
-                                );
-                              }),
                               IconButton(
                                   onPressed: () {
                                     playSong(e);
                                   },
                                   icon: const Icon(Icons.play_arrow_rounded)
                               ),
-
+                              PopupMenuButton<int>(
+                                icon: const Icon(Icons.more_vert_rounded),
+                                itemBuilder: (context) => [
+                                  const PopupMenuItem(
+                                    value: 1,
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.download_rounded),
+                                        SizedBox(width: 8),
+                                        Text('Download'),
+                                      ],
+                                    ),
+                                  ),
+                                    const PopupMenuItem(
+                                      value: 2,
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.delete_rounded),
+                                          SizedBox(width: 8),
+                                          Text('Delete'),
+                                        ],
+                                      )
+                                    )
+                                ],
+                                onSelected: (value) {
+                                  if (value == 1) {
+                                    final audioUrl = e.audioUrl;
+                                    final audioTitle = e.title;
+                                    if (!e.hasMp3Url() ||
+                                        audioUrl == null ||
+                                        audioTitle == null) {
+                                      return;
+                                    }
+                                    downloadAudioFile(audioUrl, audioTitle);
+                                  }
+                                  if (value == 2) {
+                                    final id = e.id;
+                                    if (id == null) {
+                                      return;
+                                    }
+                                    onDeleteSong(id);
+                                  }
+                                },
+                              ),
                             ],
                           ),
                         );
@@ -463,89 +508,7 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                 )),
-                Container(
-                    height: 64,
-                    padding: const EdgeInsets.only(
-                        left: 16, right: 16, top: 8, bottom: 8),
-                    color: Theme.of(context).colorScheme.secondaryContainer,
-                    child: playerProvider.currentSong == null
-                        ? Container()
-                        : Row(
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  // go to player
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const PlayerScreen()),
-                                  );
-                                },
-                                child: Builder(builder: (context) {
-                                  final imageUrl =
-                                      playerProvider.currentSong?.imageUrl;
-                                  if (imageUrl == null || imageUrl.isEmpty) {
-                                    return ClipRRect(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      child: Container(
-                                        width: 48,
-                                        height: 48,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .secondaryFixedDim,
-                                      ),
-                                    );
-                                  }
-                                  return ClipRRect(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      child: Image.network(
-                                        imageUrl,
-                                        width: 48,
-                                        height: 48,
-                                      ));
-                                }),
-                              ),
-                              Expanded(
-                                child: Container(
-                                  padding: const EdgeInsets.only(left: 16),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        playerProvider.currentSong?.title ?? "",
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              StreamBuilder<PlayerState>(
-                                  stream:
-                                      playerProvider.player.playerStateStream,
-                                  builder: (
-                                    context,
-                                    snapshot,
-                                  ) {
-                                    final playerState = snapshot.data;
-                                    if (playerState == null) {
-                                      return Container();
-                                    }
-                                    return IconButton(
-                                        onPressed: () {
-                                          if (playerState.playing) {
-                                            playerProvider.player.pause();
-                                          } else {
-                                            playerProvider.player.play();
-                                          }
-                                        },
-                                        icon: Icon(playerState.playing
-                                            ? Icons.pause_rounded
-                                            : Icons.play_arrow_rounded));
-                                  }),
-                            ],
-                          )),
+                PlayBar(),
                 Platform.isAndroid
                     ? Container(
                         height: 16,

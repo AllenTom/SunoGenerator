@@ -23,9 +23,7 @@ class SunoClient {
     return _singleton;
   }
 
-  SunoClient._internal() {
-
-  }
+  SunoClient._internal() {}
 
   void applyCookie(String cookieString) {
     cookie = cookieString;
@@ -261,5 +259,21 @@ class SunoClient {
     await Future.delayed(Duration(seconds: 5));
     var result = await getGenerateLyrics(id);
     return result;
+  }
+
+  Future deleteSongs(List<String> ids) async {
+    await renewToken();
+    var response = await dio.request('https://studio-api.suno.ai/api/gen/trash/',
+        data: {"clip_ids": ids, "trash": true},
+        options: Options(
+          method: 'POST',
+          headers: {
+            'Cookie': cookie,
+            'User-Agent': ua,
+            'Accept': 'application/json',
+            'Authorization': 'Bearer $token'
+          },
+        ));
+    return response.data;
   }
 }

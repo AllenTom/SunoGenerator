@@ -52,4 +52,9 @@ class HomeProvider with ChangeNotifier {
     notifyListeners();
     await loadSongs();
   }
+
+  deleteSong(String id) async {
+    await client.deleteSongs([id]);
+    await loadSongs(force: true);
+  }
 }
