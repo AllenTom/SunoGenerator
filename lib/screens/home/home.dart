@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:untitled/components/song_item.dart';
 import 'package:untitled/login.dart';
-import 'package:untitled/new_song_dialog.dart';
+import 'package:untitled/components/new_song_dialog.dart';
 import 'package:untitled/play_bar.dart';
 import 'package:untitled/player_provider.dart';
 import 'package:untitled/screens/home/provider.dart';
@@ -63,9 +63,9 @@ class _HomePageState extends State<HomePage> {
         SunoClient client = SunoClient();
         if (homeProvider.isFirst || force) {
           final providerUser = Provider.of<UserProvider>(context);
-          if (providerUser.loginInfo == null && client.cookie.isNotEmpty) {
-            await providerUser.loginUser(client.cookie);
-          }
+          // if (providerUser.loginInfo == null && client.cookie.isNotEmpty) {
+          //   await providerUser.loginUser(client.cookie);
+          // }
           homeProvider.init();
         }
       }

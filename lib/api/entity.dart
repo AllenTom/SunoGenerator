@@ -225,6 +225,18 @@ class SunoPlaylist {
     data['is_public'] = isPublic;
     return data;
   }
+
+  List<SongMeta> getSongMetaList(){
+    List<SongMeta> songMetaList = [];
+    if(playlistClips != null){
+      for (var playlistClip in playlistClips!) {
+        if(playlistClip.clip != null){
+          songMetaList.add(playlistClip.clip!);
+        }
+      }
+    }
+    return songMetaList;
+  }
 }
 
 class PlaylistClips {
@@ -250,3 +262,27 @@ class PlaylistClips {
     return data;
   }
 }
+
+class UserPlaylist {
+  late int currentPage;
+  late int numTotalResults;
+  List<SunoPlaylist> playlists = [];
+  static fromJson(Map<String, dynamic> json) {
+    UserPlaylist userPlaylist = UserPlaylist();
+    userPlaylist.currentPage = json['current_page'];
+    userPlaylist.numTotalResults = json['num_total_results'];
+    List<dynamic> playlists = json['playlists'];
+    for (var playlist in playlists) {
+      userPlaylist.playlists.add(SunoPlaylist.fromJson(playlist));
+    }
+    return userPlaylist;
+  }
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['current_page'] = currentPage;
+    data['num_total_results'] = numTotalResults;
+    data['playlists'] = playlists.map((playlist) => playlist.toJson()).toList();
+    return data;
+  }
+}
+

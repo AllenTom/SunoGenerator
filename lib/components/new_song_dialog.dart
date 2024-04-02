@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/api/client.dart';
 
-import 'generated/l10n.dart';
+import '../generated/l10n.dart';
 
 class NewSongDialog extends StatefulWidget {
   Function(String? prompt, String? lyrics, bool isInstrumental, String? style,

@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:untitled/screens/explore/explore.dart';
 import 'package:untitled/screens/home/home.dart';
 import 'package:untitled/screens/home/provider.dart';
+import 'package:untitled/screens/library/library.dart';
+import 'package:untitled/screens/library/provider.dart';
 
 import 'explore/provider.dart';
 
@@ -14,8 +16,9 @@ class IndexPage extends StatefulWidget {
 class _IndexPageState extends State<IndexPage> {
   int _currentIndex = 0;
   final List<Widget> _children = [
-    HomePage(),
-    ExplorePage()
+    const HomePage(),
+    const ExplorePage(),
+    const LibraryPage()
   ];
 
   void onTabTapped(int index) {
@@ -30,6 +33,7 @@ class _IndexPageState extends State<IndexPage> {
       providers: [
         ChangeNotifierProvider(create: (context) => HomeProvider()),
         ChangeNotifierProvider(create: (context) => ExploreProvider()),
+        ChangeNotifierProvider(create: (context) => LibraryProvider()),
       ],
       child: Scaffold(
         body: _children[_currentIndex],
@@ -37,7 +41,7 @@ class _IndexPageState extends State<IndexPage> {
           onTap: onTabTapped,
           currentIndex: _currentIndex,
           backgroundColor: Theme.of(context).colorScheme.surface,
-          items: [
+          items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.edit),
               label: 'Edit',
@@ -45,6 +49,10 @@ class _IndexPageState extends State<IndexPage> {
             BottomNavigationBarItem(
               icon: Icon(Icons.explore),
               label: 'Explore',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.library_music_rounded),
+              label: 'Library',
             ),
           ],
         ),
@@ -56,20 +64,20 @@ class _IndexPageState extends State<IndexPage> {
 class Tab1Page extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text('Tab 1 Page'));
+    return const Center(child: Text('Tab 1 Page'));
   }
 }
 
 class Tab2Page extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text('Tab 2 Page'));
+    return const Center(child: Text('Tab 2 Page'));
   }
 }
 
 class Tab3Page extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text('Tab 3 Page'));
+    return const Center(child: Text('Tab 3 Page'));
   }
 }

@@ -20,7 +20,8 @@ class UserProvider extends ChangeNotifier {
 
   loginUser(String cookie) async {
     client.applyCookie(cookie);
-    final loginInfo = await client.getSession();
+    await client.loginUser();
+    final loginInfo = client.userInfo;
     if (loginInfo != null) {
       await AppDataStore().addUserData(User(
           id: loginInfo.id,

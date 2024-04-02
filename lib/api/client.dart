@@ -8,6 +8,8 @@ import 'package:flutter/foundation.dart';
 import 'package:random_x/random_x.dart';
 import 'package:untitled/api/entity.dart';
 
+import '../store.dart';
+
 class SunoClient {
   var dio = Dio();
   final String get_session_url =
@@ -16,6 +18,7 @@ class SunoClient {
   String token = "";
   String sid = "";
   String cookie = "";
+  LoginInfo? userInfo;
 
   static final SunoClient _singleton = SunoClient._internal();
 
@@ -100,9 +103,12 @@ class SunoClient {
     return response.data['total_credits_left'];
   }
 
-  Future<List<SongMeta>> getSongMetadata() async {
+  Future<List<SongMeta>> getSongMetadata({
+    int page = 0,
+  }) async {
     await renewToken();
     var response = await dio.request('https://studio-api.suno.ai/api/feed',
+        queryParameters: {"page": page},
         options: Options(method: 'GET', headers: {
           'Cookie': cookie,
           'User-Agent': ua,
@@ -290,5 +296,52 @@ class SunoClient {
               'Authorization': 'Bearer $token'
             }));
     return SunoPlaylist.fromJson(response.data);
+  }
+
+  Future loginUser() async {
+    final loginInfo = await getSession();
+    if (loginInfo != null) {
+      await AppDataStore().addUserData(User(
+          id: loginInfo.id,
+          firstName: loginInfo.firstName,
+          lastName: loginInfo.lastName,
+          avatar: loginInfo.avatar,
+          token: cookie,
+          sid: sid));
+      userInfo = loginInfo;
+    }
+  }
+
+  Future<UserPlaylist> getUserPlaylist({
+    int page = 1,
+  }) async {
+    await renewToken();
+    var response =
+        await dio.request('https://studio-api.suno.ai/api/playlist/me',
+            queryParameters: {"page": page},
+            options: Options(method: 'GET', headers: {
+              'Cookie': cookie,
+              'User-Agent': ua,
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $token'
+            }));
+    return UserPlaylist.fromJson(response.data);
+  }
+
+  Future editPlaylist(
+      {required String id,
+      required String name,
+      required String description}) async {
+    await renewToken();
+    var response = await dio.request(
+        'https://studio-api.suno.ai/api/playlist/set_metadata/',
+        data: {"name": name, "description": description,"playlist_id":id},
+        options: Options(method: 'POST', headers: {
+          'Cookie': cookie,
+          'User-Agent': ua,
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token'
+        }));
+    return response.data;
   }
 }

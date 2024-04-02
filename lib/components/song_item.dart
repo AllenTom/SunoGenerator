@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:untitled/api/client.dart';
 import 'package:untitled/api/entity.dart';
 
 import '../screens/detail/song_detail.dart';
@@ -11,13 +12,12 @@ class SongItem extends StatefulWidget {
   Function(String audioUrl, String audioTitle)? downloadAudioFile;
   Function(SongMeta meta)? onAddToQueue;
 
-  SongItem(
-      {super.key,
-      required this.meta,
-      this.onPlaySong,
-      this.onDeleteSong,
-      this.downloadAudioFile,
-      this.onAddToQueue});
+  SongItem({super.key,
+    required this.meta,
+    this.onPlaySong,
+    this.onDeleteSong,
+    this.downloadAudioFile,
+    this.onAddToQueue});
 
   @override
   State<SongItem> createState() => _SongItemState();
@@ -27,7 +27,7 @@ class _SongItemState extends State<SongItem> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
       child: Row(
         children: [
           Builder(builder: (context) {
@@ -48,7 +48,10 @@ class _SongItemState extends State<SongItem> {
                   child: Container(
                     width: 72,
                     height: 72,
-                    color: Theme.of(context).colorScheme.secondaryFixedDim,
+                    color: Theme
+                        .of(context)
+                        .colorScheme
+                        .secondaryFixedDim,
                   ),
                 ),
               );
@@ -76,6 +79,16 @@ class _SongItemState extends State<SongItem> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(widget.meta.title ?? ""),
+                  Text(
+                    widget.meta.metadata?.tags ?? "",
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: Theme
+                            .of(context)
+                            .colorScheme
+                            .onSurface
+                            .withAlpha(150)),
+                  ),
                 ],
               ),
             ),

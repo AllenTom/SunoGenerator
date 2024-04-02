@@ -79,6 +79,26 @@ class PlayerProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
+  addListToQueue(List<SongMeta> songMeta) async {
+    List<AudioSource> audioSources = [];
+    for (var song in songMeta) {
+      audioSources.add(
+          AudioSource.uri(
+              Uri.parse(song.audioUrl!),
+              tag: song
+          )
+      );
+    }
+    if (playlist != null) {
+      final currentIndex = player.currentIndex;
+      if (currentIndex == null) {
+        return;
+      }
+      playlist!.insertAll(currentIndex + 1, audioSources);
+      return;
+    }
+    notifyListeners();
+  }
   seekQueue(int index) async {
     if (playlist != null) {
       await player.seek(Duration.zero, index: index);

@@ -110,9 +110,11 @@ class AppDataStore {
     final raw = jsonDecode(configString);
     config = AppConfig.fromJson(raw);
 
-    if (!prefs.containsKey('playlist_history')) {
+    if (prefs.containsKey('playlist_history')) {
       var historyRaw = jsonDecode(prefs.getString('playlist_history')!);
       playlistHistory = PlaylistHistory.fromJson(historyRaw);
+    }else{
+      playlistHistory = PlaylistHistory();
     }
   }
 

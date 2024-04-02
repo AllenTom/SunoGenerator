@@ -53,25 +53,35 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool isFirst = true;
   initApp() async {
     AppDataStore store = AppDataStore();
     await AppDataStore().refresh();
     User? lastLogin = store.getLastLoginUser();
     if (lastLogin != null) {
       SunoClient().cookie = lastLogin.token;
+      await SunoClient().loginUser();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-
     return FutureBuilder(
       future: initApp(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
+          if (isFirst) {
+            isFirst = false;
+            final userProvider = Provider.of<UserProvider>(context, listen: false);
+            userProvider.loginInfo = SunoClient().userInfo;
+          }
           return IndexPage();
         }
-        return Container();
+        return Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
+          )
+        );
       },
     );
   }
