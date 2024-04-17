@@ -22,8 +22,7 @@ class _ExplorePageState extends State<ExplorePage> {
         builder: (context, exploreProvider, playerProvider, child) {
       return Scaffold(
         appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
+          backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0),
           scrolledUnderElevation: 0,
           centerTitle: false,
           title: Text("Explore"),
@@ -94,14 +93,17 @@ class _ExplorePageState extends State<ExplorePage> {
                               itemCount: playlist.playlistClips!.length,
                               itemBuilder: (context, index) {
                                 final song = playlist!.playlistClips![index];
-                                return SongItem(
-                                  meta: song.clip!,
-                                  onPlaySong: (SongMeta meta) {
-                                    playerProvider.playSongs([meta]);
-                                  },
-                                  onAddToQueue: (SongMeta meta) {
-                                    playerProvider.addToQueue(meta);
-                                  },
+                                return Container(
+                                  margin: const EdgeInsets.only(bottom: 8),
+                                  child: SongItem(
+                                    meta: song.clip!,
+                                    onPlaySong: (SongMeta meta) {
+                                      playerProvider.playSongs([meta]);
+                                    },
+                                    onAddToQueue: (SongMeta meta) {
+                                      playerProvider.addToQueue(meta);
+                                    },
+                                  ),
                                 );
                               },
                             ),

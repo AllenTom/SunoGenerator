@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:provider/provider.dart';
 import 'package:untitled/player_provider.dart';
@@ -14,91 +15,100 @@ class PlayBar extends StatefulWidget {
 }
 
 class _PlayBarState extends State<PlayBar> {
+
   @override
   Widget build(BuildContext context) {
+
     return Consumer<PlayerProvider>(builder: (context, playerProvider, child) {
       showBottomModelOfPlaylist() {
         showModalBottomSheet(
             context: context,
             builder: (context) {
-              return Container(
-                color: Theme.of(context).colorScheme.surface,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      child: const Text(
-                        "Playlist",
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.left,
+              return ClipRRect(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+                child: Container(
+
+                  color: Theme.of(context).colorScheme.surface,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        child: const Text(
+                          "Playlist",
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.left,
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.only(left: 16, right: 16),
-                        child: Builder(
-                            builder: (context) {
-                              final SequenceState? seqState = playerProvider.sequenceState;
-                              if (seqState == null) {
-                                return Container();
-                              }
-                              final List<IndexedAudioSource> audios =
-                                  seqState.sequence;
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.only(left: 16, right: 16),
+                          child: Builder(
+                              builder: (context) {
+                                final SequenceState? seqState = playerProvider.sequenceState;
+                                if (seqState == null) {
+                                  return Container();
+                                }
+                                final List<IndexedAudioSource> audios =
+                                    seqState.sequence;
 
-                              return ListView.builder(
-                                itemCount: audios.length,
-                                itemBuilder: (context, index) {
-                                  IndexedAudioSource song = audios[index];
-                                  final meta = song.tag as SongMeta?;
-                                  final currentIndex = seqState.currentIndex;
-                                  return ListTile(
-                                    onTap: () {
-                                      playerProvider.player.seek(Duration.zero,
-                                          index: index);
-                                      Navigator.pop(context);
-                                    },
-                                      contentPadding: const EdgeInsets.only(
-                                          bottom: 8, top: 8),
-                                      leading: Builder(builder: (context) {
+                                return ListView.builder(
+                                  itemCount: audios.length,
+                                  itemBuilder: (context, index) {
+                                    IndexedAudioSource song = audios[index];
+                                    final meta = song.tag as SongMeta?;
+                                    final currentIndex = seqState.currentIndex;
+                                    return ListTile(
+                                      onTap: () {
+                                        playerProvider.player.seek(Duration.zero,
+                                            index: index);
+                                        Navigator.pop(context);
+                                      },
+                                        contentPadding: const EdgeInsets.only(
+                                            bottom: 8, top: 8),
+                                        leading: Builder(builder: (context) {
 
-                                        final imageUrl = meta?.imageUrl;
-                                        if (imageUrl == null ||
-                                            imageUrl.isEmpty) {
+                                          final imageUrl = meta?.imageUrl;
+                                          if (imageUrl == null ||
+                                              imageUrl.isEmpty) {
+                                            return ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0),
+                                              child: Container(
+                                                width: 48,
+                                                height: 48,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .secondaryFixedDim,
+                                              ),
+                                            );
+                                          }
                                           return ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                            child: Container(
-                                              width: 48,
-                                              height: 48,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .secondaryFixedDim,
-                                            ),
-                                          );
-                                        }
-                                        return ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(8.0),
-                                            child: Image.network(
-                                              imageUrl,
-                                              width: 48,
-                                              height: 48,
-                                            ));
-                                      }),
-                                      title: Text(
-                                        meta?.title ?? "",
-                                      ),
-                                    selected: currentIndex == index,
-                                  );
-                                },
-                              );
-                            }),
-                      ),
-                    )
-                  ],
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0),
+                                              child: Image.network(
+                                                imageUrl,
+                                                width: 48,
+                                                height: 48,
+                                              ));
+                                        }),
+                                        title: Text(
+                                          meta?.title ?? "",
+                                        ),
+                                      selected: currentIndex == index,
+                                    );
+                                  },
+                                );
+                              }),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               );
             });

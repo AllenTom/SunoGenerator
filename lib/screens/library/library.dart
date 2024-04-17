@@ -30,11 +30,10 @@ class _LibraryPageState extends State<LibraryPage> {
       });
       return Scaffold(
         appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          scrolledUnderElevation: 0,
           centerTitle: false,
-          title: Text("Explore"),
+          backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0),
+          scrolledUnderElevation: 0,
+          title: Text("Library"),
         ),
         body: Container(
           child: Column(
@@ -85,14 +84,17 @@ class _LibraryPageState extends State<LibraryPage> {
                                 itemCount: playlist.length,
                                 itemBuilder: (context, index) {
                                   final song = playlist[index];
-                                  return SongItem(
-                                    meta: song,
-                                    onPlaySong: (SongMeta meta) {
-                                      playerProvider.playSongs([meta]);
-                                    },
-                                    onAddToQueue: (SongMeta meta) {
-                                      playerProvider.addToQueue(meta);
-                                    },
+                                  return Container(
+                                    margin: const EdgeInsets.only(bottom: 8),
+                                    child: SongItem(
+                                      meta: song,
+                                      onPlaySong: (SongMeta meta) {
+                                        playerProvider.playSongs([meta]);
+                                      },
+                                      onAddToQueue: (SongMeta meta) {
+                                        playerProvider.addToQueue(meta);
+                                      },
+                                    ),
                                   );
                                 },
                               ),

@@ -66,32 +66,62 @@ class AppConfig {
   }
 }
 
-class PlaylistHistory {
+class UserPlayHistory {
   List<SongMeta> songs = [];
-  addSong(SongMeta song) {
-    songs = songs.where((s) => s.id != song.id).toList();
-    songs.insert(0, song);
-  }
-  setSongs(List<SongMeta> songs) {
-    this.songs = songs;
+  int index;
+
+  UserPlayHistory({required this.songs, this.index = 0});
+
+  static fromJson(Map<String, dynamic> json) {
+    List<SongMeta> songs = [];
+    for (var song in json['songs']) {
+      songs.add(SongMeta.fromJson(song));
+    }
+    return UserPlayHistory(songs: songs, index: json['index']);
   }
 
-  static fromJson(List<dynamic> json) {
+  Map toJson() {
+    return {
+      'songs': songs.map((song) => song.toJson()).toList(),
+      'index': index
+    };
+  }
+}
+
+class PlaylistHistory {
+  Map<String, UserPlayHistory> historyMap = {};
+
+  static fromJson(Map<String, dynamic> json) {
     PlaylistHistory history = PlaylistHistory();
-    for (var song in json) {
-      history.songs.add(SongMeta.fromJson(song));
-    }
+    json.forEach((key, value) {
+      history.historyMap[key] = UserPlayHistory.fromJson(value);
+    });
     return history;
   }
-  List<dynamic> toJson() {
-    return songs.map((song) => song.toJson()).toList();
+
+  Map toJson() {
+    return historyMap.map((key, value) => MapEntry(key, value.toJson()));
+  }
+
+  UserPlayHistory getHistory(String userId) {
+    if (!historyMap.containsKey(userId)) {
+      historyMap[userId] = UserPlayHistory(songs: []);
+    }
+    return historyMap[userId]!;
+  }
+
+  setHistory(String userId, UserPlayHistory history) {
+    historyMap[userId] = history;
   }
 }
 
 class AppDataStore {
   static const String CONFIG_STORE_KEY = 'app_config';
+  static const String PLAYLIST_HISTORY_KEY = 'playlist_history_save_1';
+  static const String LOGOUT_FLAG_KEY = 'logout_flag';
   late AppConfig config;
   late PlaylistHistory playlistHistory;
+  bool logoutFlag = false;
   static final AppDataStore _instance = AppDataStore._internal();
 
   factory AppDataStore() {
@@ -109,13 +139,21 @@ class AppDataStore {
     final String configString = prefs.getString(CONFIG_STORE_KEY)!;
     final raw = jsonDecode(configString);
     config = AppConfig.fromJson(raw);
-
-    if (prefs.containsKey('playlist_history')) {
-      var historyRaw = jsonDecode(prefs.getString('playlist_history')!);
-      playlistHistory = PlaylistHistory.fromJson(historyRaw);
-    }else{
+    if (prefs.containsKey(LOGOUT_FLAG_KEY)) {
+      logoutFlag = prefs.getBool(LOGOUT_FLAG_KEY)!;
+    }
+    if (prefs.containsKey(PLAYLIST_HISTORY_KEY)) {
+      String raw = prefs.getString(PLAYLIST_HISTORY_KEY)!;
+      try {
+        var historyRaw = jsonDecode(raw);
+        playlistHistory = PlaylistHistory.fromJson(historyRaw);
+      } catch (e) {
+        print(e);
+      }
+    } else {
       playlistHistory = PlaylistHistory();
     }
+
   }
 
   save() async {
@@ -124,10 +162,11 @@ class AppDataStore {
     prefs.setString(CONFIG_STORE_KEY, configString);
   }
 
-  addUserData(User user) async{
+  addUserData(User user) async {
     config.addUser(user);
     await save();
   }
+
   User? getLastLoginUser() {
     if (config.users.isEmpty) {
       return null;
@@ -135,13 +174,15 @@ class AppDataStore {
     return config.users[0];
   }
 
-  addSongToHistory(SongMeta song) async {
-    playlistHistory.addSong(song);
-    await saveHistory();
-  }
   saveHistory() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String historyString = jsonEncode(playlistHistory.toJson());
-    prefs.setString('playlist_history', historyString);
+    prefs.setString(PLAYLIST_HISTORY_KEY, historyString);
+  }
+
+  setLogoutFlag(bool flag) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    logoutFlag = flag;
+    prefs.setBool(LOGOUT_FLAG_KEY, flag);
   }
 }

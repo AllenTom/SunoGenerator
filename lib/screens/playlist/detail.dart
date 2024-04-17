@@ -62,7 +62,10 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
       builder: (context, playerProvider, child) {
         final playlist = this.playlist;
         if (playlist == null) {
-          return const Scaffold(
+          return Scaffold(
+            appBar: AppBar(
+              title: Text("Playlist"),
+            ),
             body: Center(
               child: CircularProgressIndicator(),
             ),
@@ -79,7 +82,7 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
                       child: Column(
                         children: [
                           Container(
-                            margin: const EdgeInsets.only(top: 16),
+                            margin: const EdgeInsets.only(top: 48),
                             child: Row(
                               children: [
                                 GestureDetector(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:untitled/screens/explore/explore.dart';
 import 'package:untitled/screens/home/home.dart';
@@ -14,6 +15,7 @@ class IndexPage extends StatefulWidget {
 }
 
 class _IndexPageState extends State<IndexPage> {
+
   int _currentIndex = 0;
   final List<Widget> _children = [
     const HomePage(),
@@ -25,6 +27,13 @@ class _IndexPageState extends State<IndexPage> {
     setState(() {
       _currentIndex = index;
     });
+  }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      systemNavigationBarColor: Theme.of(context).colorScheme.surface, // navigation bar color
+    ));
   }
 
   @override

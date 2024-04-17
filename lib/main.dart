@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:untitled/api/client.dart';
+import 'package:untitled/login.dart';
 import 'package:untitled/player_provider.dart';
 import 'package:untitled/screens/home/home.dart';
 import 'package:untitled/screens/index.dart';
+import 'package:untitled/screens/login/login.dart';
 import 'package:untitled/store.dart';
 import 'package:untitled/user_provider.dart';
 
@@ -51,17 +54,29 @@ class MyHomePage extends StatefulWidget {
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
-
 class _MyHomePageState extends State<MyHomePage> {
   bool isFirst = true;
-  initApp() async {
+  Future<bool> initApp() async {
     AppDataStore store = AppDataStore();
     await AppDataStore().refresh();
     User? lastLogin = store.getLastLoginUser();
-    if (lastLogin != null) {
+    if (lastLogin != null && !AppDataStore().logoutFlag) {
       SunoClient().cookie = lastLogin.token;
       await SunoClient().loginUser();
+      if (context.mounted) {
+        final playerProvider = Provider.of<PlayerProvider>(context, listen: false);
+        playerProvider.loadHistory();
+      }
+      return true;
     }
+    return false;
+  }
+
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      systemNavigationBarColor: Theme.of(context).colorScheme.surface, // navigation bar color
+    ));
   }
 
   @override
@@ -75,7 +90,15 @@ class _MyHomePageState extends State<MyHomePage> {
             final userProvider = Provider.of<UserProvider>(context, listen: false);
             userProvider.loginInfo = SunoClient().userInfo;
           }
-          return IndexPage();
+          if (snapshot.data == true) {
+            WidgetsBinding.instance!.addPostFrameCallback((_) {
+              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => IndexPage()));
+            });
+          } else {
+            WidgetsBinding.instance!.addPostFrameCallback((_) {
+              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => UserLoginPage()));
+            });
+          }
         }
         return Scaffold(
           body: Center(

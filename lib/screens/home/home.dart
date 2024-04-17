@@ -11,6 +11,7 @@ import 'package:untitled/components/new_song_dialog.dart';
 import 'package:untitled/play_bar.dart';
 import 'package:untitled/player_provider.dart';
 import 'package:untitled/screens/home/provider.dart';
+import 'package:untitled/screens/login/login.dart';
 import 'package:untitled/store.dart';
 
 import '../../api/client.dart';
@@ -104,6 +105,9 @@ class _HomePageState extends State<HomePage> {
         await playerProvider.disposePlayer();
         userProvider.loginOut();
         homeProvider.toInit();
+        await AppDataStore().setLogoutFlag(true);
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => UserLoginPage()));
       }
 
       Future onDeleteSong(String id) async {
@@ -157,62 +161,6 @@ class _HomePageState extends State<HomePage> {
                         },
                         child: Text(S.of(context).LoginOut)),
                   ),
-                  const Divider(),
-                  AppDataStore().config.users.where((element) {
-                    return element.id != userProvider.loginInfo?.id;
-                  }).isNotEmpty
-                      ? Column(
-                          children: [
-                            Container(
-                                margin:
-                                    const EdgeInsets.only(bottom: 16, top: 16),
-                                child: Text(S.of(context).SwitchToAccount)),
-                            ...AppDataStore().config.users.where((element) {
-                              return element.id != userProvider.loginInfo?.id;
-                            }).map((user) {
-                              return GestureDetector(
-                                onTap: () async {
-                                  Navigator.of(context).pop();
-                                  await onLogin(user.token);
-                                },
-                                child: Container(
-                                  margin: const EdgeInsets.only(bottom: 16),
-                                  width: double.infinity,
-                                  child: Row(
-                                    children: [
-                                      Builder(builder: (context) {
-                                        final avatar = user.avatar;
-                                        if (avatar == null) {
-                                          return Container(
-                                            width: 48,
-                                            height: 48,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .secondaryFixedDim,
-                                          );
-                                        }
-                                        return Container(
-                                          margin:
-                                              const EdgeInsets.only(right: 16),
-                                          width: 48,
-                                          height: 48,
-                                          child: CircleAvatar(
-                                            backgroundImage:
-                                                NetworkImage(avatar),
-                                          ),
-                                        );
-                                      }),
-                                      Expanded(
-                                          child: Text(
-                                              "${user.firstName} ${user.lastName}")),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            })
-                          ],
-                        )
-                      : Container()
                 ],
               ),
               actions: <Widget>[
@@ -235,90 +183,61 @@ class _HomePageState extends State<HomePage> {
 
       return Scaffold(
         appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          scrolledUnderElevation: 0,
           centerTitle: false,
           title: const Text('Suno'),
+          backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0),
+          scrolledUnderElevation: 0,
           actions: [
-            userProvider.loginInfo == null
-                ? Row(children: [
-                    (Platform.isAndroid || Platform.isIOS)
-                        ? TextButton(
-                            onPressed: () async {
-                              var result = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => LoginPage()),
-                              );
-                              await onLogin(result);
-                            },
-                            child: Text(S.of(context).Login))
-                        : Container(),
-                    Container(
-                      child: TextButton(
-                          onPressed: () {
-                            showCookieInputDialog(context,
-                                title: S.of(context).InputCookieDialog_Title,
-                                onOk: (cookieString) async {
-                              await onLogin(cookieString);
-                            });
-                          },
-                          child: Text(S.of(context).InputCookie)),
-                    )
-                  ])
-                : Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.playlist_play_rounded),
-                        onPressed: () async {
-                          await playerProvider.playSongs(homeProvider.songs);
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.add_rounded),
-                        onPressed: () {
-                          openNewSongDialog();
-                        },
-                      ),
-                      Container(
-                        width: 16,
-                      ),
-                      userProvider.loginInfo?.avatar?.isEmpty ?? true
-                          ? Container(
+            Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.playlist_play_rounded),
+                  onPressed: () async {
+                    await playerProvider.playSongs(homeProvider.songs);
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add_rounded),
+                  onPressed: () {
+                    openNewSongDialog();
+                  },
+                ),
+                Container(
+                  width: 16,
+                ),
+                userProvider.loginInfo?.avatar?.isEmpty ?? true
+                    ? Container(
+                        width: 32,
+                        height: 32,
+                        color: Theme.of(context).colorScheme.secondaryFixedDim,
+                      )
+                    : GestureDetector(
+                        onTap: _showUserInfoDialog,
+                        child: Builder(builder: (context) {
+                          if (userProvider.loginInfo == null) {
+                            return Container();
+                          }
+                          final avatar = userProvider.loginInfo?.avatar;
+                          if (avatar == null || avatar.isEmpty) {
+                            return Container(
                               width: 32,
                               height: 32,
                               color: Theme.of(context)
                                   .colorScheme
                                   .secondaryFixedDim,
-                            )
-                          : GestureDetector(
-                              onTap: _showUserInfoDialog,
-                              child: Builder(builder: (context) {
-                                if (userProvider.loginInfo == null) {
-                                  return Container();
-                                }
-                                final avatar = userProvider.loginInfo?.avatar;
-                                if (avatar == null || avatar.isEmpty) {
-                                  return Container(
-                                    width: 32,
-                                    height: 32,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .secondaryFixedDim,
-                                  );
-                                }
-                                return Container(
-                                  width: 32,
-                                  height: 32,
-                                  child: CircleAvatar(
-                                    backgroundImage: NetworkImage(avatar),
-                                  ),
-                                );
-                              }),
+                            );
+                          }
+                          return Container(
+                            width: 32,
+                            height: 32,
+                            child: CircleAvatar(
+                              backgroundImage: NetworkImage(avatar),
                             ),
-                    ],
-                  ),
+                          );
+                        }),
+                      ),
+              ],
+            ),
             Container(
               width: 16,
             )
@@ -331,72 +250,75 @@ class _HomePageState extends State<HomePage> {
               onRefresh: () async {
                 await refresh(force: true);
               },
-              child: ListView(
-                children: [
-                  ...homeProvider.generatingSong.map((e) {
-                    return Container(
-                      padding: const EdgeInsets.all(8),
-                      child: Row(
-                        children: [
-                          Builder(builder: (context) {
-                            final image = e.imageUrl;
-                            if (image == null || image.isEmpty) {
+              child: Container(
+                padding: const EdgeInsets.only(left: 16, right: 16),
+                child: ListView(
+                  children: [
+                    ...homeProvider.generatingSong.map((e) {
+                      return Container(
+                        padding: const EdgeInsets.all(8),
+                        child: Row(
+                          children: [
+                            Builder(builder: (context) {
+                              final image = e.imageUrl;
+                              if (image == null || image.isEmpty) {
+                                return ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  child: Container(
+                                    width: 72,
+                                    height: 72,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondaryFixedDim,
+                                  ),
+                                );
+                              }
                               return ClipRRect(
                                 borderRadius: BorderRadius.circular(8.0),
-                                child: Container(
+                                child: Image.network(
+                                  image,
                                   width: 72,
                                   height: 72,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .secondaryFixedDim,
                                 ),
                               );
-                            }
-                            return ClipRRect(
-                              borderRadius: BorderRadius.circular(8.0),
-                              child: Image.network(
-                                image,
-                                width: 72,
+                            }),
+                            Expanded(
+                              child: Container(
                                 height: 72,
-                              ),
-                            );
-                          }),
-                          Expanded(
-                            child: Container(
-                              height: 72,
-                              padding: const EdgeInsets.only(left: 16),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(e.title!),
-                                  const LinearProgressIndicator()
-                                ],
+                                padding: const EdgeInsets.only(left: 16),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(e.title!),
+                                    const LinearProgressIndicator()
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }),
-                  ...homeProvider.songs.map((e) {
-                    return SongItem(
-                      meta: e,
-                      onPlaySong: playSong,
-                      onDeleteSong: onDeleteSong,
-                      downloadAudioFile: downloadAudioFile,
-                    );
-                  })
-                ],
+                          ],
+                        ),
+                      );
+                    }),
+                    ...homeProvider.songs.map((e) {
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        child: SongItem(
+                          meta: e,
+                          onPlaySong: playSong,
+                          onDeleteSong: onDeleteSong,
+                          downloadAudioFile: downloadAudioFile,
+                          onAddToQueue: (song) async {
+                            await playerProvider.addToQueue(song);
+                          },
+                        ),
+                      );
+                    })
+                  ],
+                ),
               ),
             )),
-            PlayBar(),
-            Platform.isAndroid
-                ? Container(
-                    height: 16,
-                    color: Theme.of(context).colorScheme.secondaryContainer,
-                  )
-                : Container()
+            PlayBar()
           ],
         ),
       );

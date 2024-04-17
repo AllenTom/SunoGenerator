@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ffi';
 import 'dart:io';
 
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
@@ -32,6 +33,16 @@ class SunoClient {
     cookie = cookieString;
   }
 
+  Future<void> updateIfTokenExpired() async {
+    JWT jwtToken = JWT.decode(token);
+    int exp = jwtToken.payload['exp'];
+    if (DateTime.now().millisecondsSinceEpoch ~/ 1000 > exp) {
+      print('Token expired,auto renew');
+      token = await renewToken();
+    }
+    return;
+  }
+
   Future<LoginInfo?> getSession() async {
     var headers = {
       'Cookie': cookie,
@@ -39,7 +50,7 @@ class SunoClient {
       'Accept': 'application/json'
     };
     var response = await dio.request(
-      'https://clerk.suno.ai/v1/client?_clerk_js_version=4.70.5',
+      'https://clerk.suno.com/v1/client',
       options: Options(
         method: 'GET',
         headers: headers,
@@ -106,7 +117,7 @@ class SunoClient {
   Future<List<SongMeta>> getSongMetadata({
     int page = 0,
   }) async {
-    await renewToken();
+    await updateIfTokenExpired();
     var response = await dio.request('https://studio-api.suno.ai/api/feed',
         queryParameters: {"page": page},
         options: Options(method: 'GET', headers: {
@@ -129,7 +140,7 @@ class SunoClient {
       bool isInstrumental = false,
       String? style,
       String? title}) async {
-    await renewToken();
+    await updateIfTokenExpired();
     var requestData = {
       "gpt_description_prompt": prompt,
       "mv": "chirp-v3-0",
@@ -268,7 +279,7 @@ class SunoClient {
   }
 
   Future deleteSongs(List<String> ids) async {
-    await renewToken();
+    await updateIfTokenExpired();
     var response =
         await dio.request('https://studio-api.suno.ai/api/gen/trash/',
             data: {"clip_ids": ids, "trash": true},
@@ -285,7 +296,7 @@ class SunoClient {
   }
 
   Future<SunoPlaylist> getPlaylist({required String id, int page = 1}) async {
-    await renewToken();
+    await updateIfTokenExpired();
     var response =
         await dio.request('https://studio-api.suno.ai/api/playlist/$id/',
             queryParameters: {"page": page},
@@ -315,7 +326,7 @@ class SunoClient {
   Future<UserPlaylist> getUserPlaylist({
     int page = 1,
   }) async {
-    await renewToken();
+    await updateIfTokenExpired();
     var response =
         await dio.request('https://studio-api.suno.ai/api/playlist/me',
             queryParameters: {"page": page},
@@ -332,10 +343,10 @@ class SunoClient {
       {required String id,
       required String name,
       required String description}) async {
-    await renewToken();
+    await updateIfTokenExpired();
     var response = await dio.request(
         'https://studio-api.suno.ai/api/playlist/set_metadata/',
-        data: {"name": name, "description": description,"playlist_id":id},
+        data: {"name": name, "description": description, "playlist_id": id},
         options: Options(method: 'POST', headers: {
           'Cookie': cookie,
           'User-Agent': ua,

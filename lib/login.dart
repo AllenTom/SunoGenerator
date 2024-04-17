@@ -17,8 +17,8 @@ class _LoginPageState extends State<LoginPage> {
       // isInspectable: kDebugMode,
       mediaPlaybackRequiresUserGesture: false,
       allowsInlineMediaPlayback: true,
-      iframeAllowFullscreen: true);
-
+      iframeAllowFullscreen: true,
+);
   PullToRefreshController? pullToRefreshController;
   String url = "";
   double progress = 0;
@@ -26,12 +26,13 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
+
   void onMatchedCookie(String cookieString) {
     Navigator.of(context).pop(cookieString);
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,7 +70,8 @@ class _LoginPageState extends State<LoginPage> {
           Expanded(
             child: InAppWebView(
               key: webViewKey,
-              initialUrlRequest: URLRequest(url: WebUri("https://app.suno.ai/")),
+              initialUrlRequest:
+                  URLRequest(url: WebUri("https://app.suno.ai/")),
               initialSettings: settings,
               pullToRefreshController: pullToRefreshController,
               onWebViewCreated: (controller) {
@@ -162,21 +164,20 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
           Container(
-            height: 64,
-            width: double.infinity,
-            color: Theme.of(context).scaffoldBackgroundColor,
-            child:Container(
-              padding: EdgeInsets.all(8),
-              child: TextButton(
-                onPressed: () {
-                  if (useCookieString != null) {
-                    onMatchedCookie(useCookieString!);
-                  }
-                },
-                child: Text("Im' already logged in"),
-              ),
-            )
-          )
+              height: 64,
+              width: double.infinity,
+              color: Theme.of(context).scaffoldBackgroundColor,
+              child: Container(
+                padding: EdgeInsets.all(8),
+                child: TextButton(
+                  onPressed: () {
+                    if (useCookieString != null) {
+                      onMatchedCookie(useCookieString!);
+                    }
+                  },
+                  child: Text("Im' already logged in"),
+                ),
+              ))
         ],
       ),
     );

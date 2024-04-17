@@ -31,10 +31,8 @@ class SongDetail extends StatelessWidget {
       }
     }
     return Scaffold(
-        extendBodyBehindAppBar: true,
         appBar: AppBar(
-            elevation: 0,
-            backgroundColor: Colors.transparent,
+            backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0),
             scrolledUnderElevation: 0,
             actions: [
               IconButton(onPressed: (){

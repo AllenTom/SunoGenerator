@@ -18,13 +18,14 @@ class _PlayerScreenState extends State<PlayerScreen> {
       return Scaffold(
         extendBodyBehindAppBar: true,
         appBar: AppBar(
-          backgroundColor: Colors.transparent,
+          elevation: 0,
           leading: IconButton(
             icon: Icon(Icons.arrow_back_rounded),
             onPressed: () {
               Navigator.of(context).pop();
             },
           ),
+          backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0),
         ),
         body: Stack(
           children: [
