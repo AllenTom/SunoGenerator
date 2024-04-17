@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:untitled/player_provider.dart';
 
 import 'api/entity.dart';
+import 'generated/l10n.dart';
 import 'screens/player/player.dart';
 
 class PlayBar extends StatefulWidget {
@@ -130,7 +131,7 @@ class _PlayBarState extends State<PlayBar> {
               const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
           child: playerProvider.currentSong == null
               ? Container(
-            child: Center(child: const Text("No song playing")),
+            child: Center(child: Text(S.of(context).NoSongPlaying)),
           )
               : Row(
                   children: [

@@ -22,15 +22,26 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+        "AddToQueue": MessageLookupByLibrary.simpleMessage("Add to queue"),
+        "Cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
         "Close": MessageLookupByLibrary.simpleMessage("Close"),
+        "Description": MessageLookupByLibrary.simpleMessage("Description"),
+        "Download": MessageLookupByLibrary.simpleMessage("Download"),
         "DownloadAudio_Hint": MessageLookupByLibrary.simpleMessage(
             "Please select an output file"),
+        "Edit": MessageLookupByLibrary.simpleMessage("Edit"),
+        "EditPlaylist": MessageLookupByLibrary.simpleMessage("Edit playlist"),
         "Generate": MessageLookupByLibrary.simpleMessage("Generate"),
         "InputCookie": MessageLookupByLibrary.simpleMessage("Input cookie"),
         "InputCookieDialog_Title":
             MessageLookupByLibrary.simpleMessage("Input your cookie"),
         "Login": MessageLookupByLibrary.simpleMessage("Login"),
         "LoginOut": MessageLookupByLibrary.simpleMessage("Logout"),
+        "LoginWithCookie":
+            MessageLookupByLibrary.simpleMessage("Login with cookie"),
+        "LoginWithWeb": MessageLookupByLibrary.simpleMessage("Login with web"),
+        "Name": MessageLookupByLibrary.simpleMessage("Name"),
+        "New": MessageLookupByLibrary.simpleMessage("New"),
         "NewSongDialogCustomMode":
             MessageLookupByLibrary.simpleMessage("Custom mode"),
         "NewSongDialogGenerateRandom":
@@ -47,8 +58,21 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Style of music"),
         "NewSongDialogTitle":
             MessageLookupByLibrary.simpleMessage("Create a new song"),
+        "NoSongPlaying":
+            MessageLookupByLibrary.simpleMessage("No song playing"),
         "OK": MessageLookupByLibrary.simpleMessage("OK"),
+        "Play": MessageLookupByLibrary.simpleMessage("Play"),
+        "Playlists": MessageLookupByLibrary.simpleMessage("Playlists"),
+        "RenamePlaylist":
+            MessageLookupByLibrary.simpleMessage("Rename playlist"),
+        "Save": MessageLookupByLibrary.simpleMessage("Save"),
+        "Songs": MessageLookupByLibrary.simpleMessage("Songs"),
         "SwitchToAccount": MessageLookupByLibrary.simpleMessage("Switch to"),
+        "TabEdit": MessageLookupByLibrary.simpleMessage("Edit"),
+        "TabExplore": MessageLookupByLibrary.simpleMessage("Explore"),
+        "TabLibrary": MessageLookupByLibrary.simpleMessage("Library"),
+        "Trending": MessageLookupByLibrary.simpleMessage("Trending"),
+        "Updating": MessageLookupByLibrary.simpleMessage("Updating"),
         "UserInfo": MessageLookupByLibrary.simpleMessage("User Info")
       };
 }

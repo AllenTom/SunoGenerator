@@ -7,6 +7,7 @@ import 'package:untitled/player_provider.dart';
 import 'package:untitled/screens/explore/provider.dart';
 
 import '../../api/entity.dart';
+import '../../generated/l10n.dart';
 
 class ExplorePage extends StatefulWidget {
   const ExplorePage({super.key});
@@ -25,7 +26,7 @@ class _ExplorePageState extends State<ExplorePage> {
           backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0),
           scrolledUnderElevation: 0,
           centerTitle: false,
-          title: Text("Explore"),
+          title: Text(S.of(context).TabExplore),
         ),
         body: Container(
           child: Column(
@@ -40,7 +41,7 @@ class _ExplorePageState extends State<ExplorePage> {
                         child: Row(
                           children: [
                             ChoiceChip(
-                              label: Text("Trending"),
+                              label: Text(S.of(context).Trending),
                               selected: exploreProvider.category == "Trending",
                               onSelected: (selected) {
                                 exploreProvider.switchCategory("Trending");
@@ -50,7 +51,7 @@ class _ExplorePageState extends State<ExplorePage> {
                             Container(
                               margin: EdgeInsets.only(left: 8),
                               child: ChoiceChip(
-                                label: Text("New"),
+                                label: Text(S.of(context).New),
                                 selected: exploreProvider.category == "New",
                                 onSelected: (selected) {
                                   exploreProvider.switchCategory("New");

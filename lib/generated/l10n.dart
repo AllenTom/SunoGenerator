@@ -229,6 +229,216 @@ class S {
       args: [],
     );
   }
+
+  /// `Login with web`
+  String get LoginWithWeb {
+    return Intl.message(
+      'Login with web',
+      name: 'LoginWithWeb',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Login with cookie`
+  String get LoginWithCookie {
+    return Intl.message(
+      'Login with cookie',
+      name: 'LoginWithCookie',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No song playing`
+  String get NoSongPlaying {
+    return Intl.message(
+      'No song playing',
+      name: 'NoSongPlaying',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Edit`
+  String get TabEdit {
+    return Intl.message(
+      'Edit',
+      name: 'TabEdit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Explore`
+  String get TabExplore {
+    return Intl.message(
+      'Explore',
+      name: 'TabExplore',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Library`
+  String get TabLibrary {
+    return Intl.message(
+      'Library',
+      name: 'TabLibrary',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Trending`
+  String get Trending {
+    return Intl.message(
+      'Trending',
+      name: 'Trending',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `New`
+  String get New {
+    return Intl.message(
+      'New',
+      name: 'New',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Songs`
+  String get Songs {
+    return Intl.message(
+      'Songs',
+      name: 'Songs',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Playlists`
+  String get Playlists {
+    return Intl.message(
+      'Playlists',
+      name: 'Playlists',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Rename playlist`
+  String get RenamePlaylist {
+    return Intl.message(
+      'Rename playlist',
+      name: 'RenamePlaylist',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cancel`
+  String get Cancel {
+    return Intl.message(
+      'Cancel',
+      name: 'Cancel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Save`
+  String get Save {
+    return Intl.message(
+      'Save',
+      name: 'Save',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Play`
+  String get Play {
+    return Intl.message(
+      'Play',
+      name: 'Play',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Download`
+  String get Download {
+    return Intl.message(
+      'Download',
+      name: 'Download',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Updating`
+  String get Updating {
+    return Intl.message(
+      'Updating',
+      name: 'Updating',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add to queue`
+  String get AddToQueue {
+    return Intl.message(
+      'Add to queue',
+      name: 'AddToQueue',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Edit`
+  String get Edit {
+    return Intl.message(
+      'Edit',
+      name: 'Edit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Edit playlist`
+  String get EditPlaylist {
+    return Intl.message(
+      'Edit playlist',
+      name: 'EditPlaylist',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Name`
+  String get Name {
+    return Intl.message(
+      'Name',
+      name: 'Name',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Description`
+  String get Description {
+    return Intl.message(
+      'Description',
+      name: 'Description',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

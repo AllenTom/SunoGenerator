@@ -2,7 +2,10 @@
 a client for suno to use ai music generator
 
 ## Preview
-<img src="./doc/app.jpg" width=200 />
+<img src="./doc/new_main.jpg" width=200 />
+<img src="./doc/new_explore.jpg" width=200 />
+<img src="./doc/new_song_detail.jpg" width=200 />
+<img src="./doc/new_song_play.jpg" width=200 />
 
 
 ## Login to suno ai
@@ -13,11 +16,11 @@ use in app webview to login to suno ai,will read token and save
 
 click login button to login
 
-<img src="./doc/first.png" width=200 />
+<img src="./doc/new_login.jpg" width=200 />
 
 login to suno and click    `Im' already logined in` button
 
-<img src="./doc/already_login.png" width=200 />
+<img src="./doc/new_login_to_suno.jpg" width=200 />
 
 
 ### For other platform
@@ -35,5 +38,5 @@ input cookie string to login
 
 7. copy `cookie` string to input box
 
-<img src="./doc/input_cookie.png" width=200 />
+<img src="./doc/new_input_cookie.jpg" width=200 />
 

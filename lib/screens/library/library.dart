@@ -7,6 +7,7 @@ import 'package:untitled/utils.dart';
 
 import '../../api/entity.dart';
 import '../../components/song_item.dart';
+import '../../generated/l10n.dart';
 import '../../play_bar.dart';
 
 class LibraryPage extends StatefulWidget {
@@ -33,7 +34,7 @@ class _LibraryPageState extends State<LibraryPage> {
           centerTitle: false,
           backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0),
           scrolledUnderElevation: 0,
-          title: Text("Library"),
+          title: Text(S.of(context).TabLibrary),
         ),
         body: Container(
           child: Column(
@@ -48,7 +49,7 @@ class _LibraryPageState extends State<LibraryPage> {
                         child: Row(
                           children: [
                             ChoiceChip(
-                              label: Text("Songs"),
+                              label: Text(S.of(context).Songs),
                               selected: libraryProvider.category == "Songs",
                               onSelected: (selected) {
                                 libraryProvider.switchCategory("Songs");
@@ -58,7 +59,7 @@ class _LibraryPageState extends State<LibraryPage> {
                             Container(
                               margin: EdgeInsets.only(left: 8),
                               child: ChoiceChip(
-                                label: Text("Playlists"),
+                                label: Text(S.of(context).Playlists),
                                 selected:
                                     libraryProvider.category == "Playlists",
                                 onSelected: (selected) {
@@ -127,7 +128,7 @@ class _LibraryPageState extends State<LibraryPage> {
                                           context: context,
                                           builder: (context) {
                                             return AlertDialog(
-                                              title: Text("Rename playlist"),
+                                              title: Text(S.of(context).RenamePlaylist),
                                               content: TextField(
                                                 controller:
                                                     TextEditingController(
@@ -138,13 +139,13 @@ class _LibraryPageState extends State<LibraryPage> {
                                                   onPressed: () {
                                                     Navigator.pop(context);
                                                   },
-                                                  child: Text("Cancel"),
+                                                  child: Text(S.of(context).Cancel),
                                                 ),
                                                 TextButton(
                                                   onPressed: () {
                                                     Navigator.pop(context);
                                                   },
-                                                  child: Text("Save"),
+                                                  child: Text(S.of(context).Save),
                                                 ),
                                               ],
                                             );

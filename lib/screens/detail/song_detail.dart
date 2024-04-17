@@ -30,25 +30,30 @@ class SongDetail extends StatelessWidget {
         // User canceled the picker
       }
     }
+
     return Scaffold(
         appBar: AppBar(
-            backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0),
+            backgroundColor:
+                Theme.of(context).colorScheme.surface.withOpacity(0),
             scrolledUnderElevation: 0,
             actions: [
-              IconButton(onPressed: (){
-                final playerProvider = Provider.of<PlayerProvider>(context, listen: false);
-                playerProvider.addToQueue(meta);
-              }, icon: Icon(Icons.playlist_add)),
+              IconButton(
+                  onPressed: () {
+                    final playerProvider =
+                        Provider.of<PlayerProvider>(context, listen: false);
+                    playerProvider.addToQueue(meta);
+                  },
+                  icon: Icon(Icons.playlist_add)),
               PopupMenuButton<int>(
                 icon: const Icon(Icons.more_vert_rounded),
                 itemBuilder: (context) => [
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 1,
                     child: Row(
                       children: [
                         Icon(Icons.download_rounded),
                         SizedBox(width: 8),
-                        Text('Download'),
+                        Text(S.of(context).Download),
                       ],
                     ),
                   ),
@@ -129,22 +134,21 @@ class SongDetail extends StatelessWidget {
                                     .withAlpha(150)),
                           ),
                           Container(
-                            margin: EdgeInsets.only(top: 16,bottom: 16),
+                            margin: EdgeInsets.only(top: 16, bottom: 16),
                             width: double.infinity,
-                            child:FilledButton(
-
+                            child: FilledButton(
                                 onPressed: () {
                                   final playerProvider =
                                       Provider.of<PlayerProvider>(context,
                                           listen: false);
                                   playerProvider.playSongs([meta]);
                                 },
-                                child: Row (
+                                child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Icon(Icons.play_arrow_rounded),
-                                    Text("Play")
+                                    Text(S.of(context).Play),
                                   ],
                                 )),
                           ),

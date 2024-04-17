@@ -8,6 +8,8 @@ import 'package:untitled/components/song_item.dart';
 import 'package:untitled/play_bar.dart';
 import 'package:untitled/player_provider.dart';
 
+import '../../generated/l10n.dart';
+
 class PlaylistDetail extends StatefulWidget {
   SunoPlaylist playlist;
   Function(SunoPlaylist playlist)? onUpdateMeta;
@@ -33,8 +35,8 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return const AlertDialog(
-          title: Text("Updating..."),
+        return AlertDialog(
+          title: Text(S.of(context).Updating),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -64,7 +66,7 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
         if (playlist == null) {
           return Scaffold(
             appBar: AppBar(
-              title: Text("Playlist"),
+              title: Text(S.of(context).Playlists),
             ),
             body: Center(
               child: CircularProgressIndicator(),
@@ -129,14 +131,14 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
                                   return PopupMenuButton(
                                     icon: const Icon(Icons.more_vert_rounded),
                                     itemBuilder: (context) {
-                                      List<PopupMenuItem> items = [const PopupMenuItem(
-                                        child: Text("Add to queue"),
+                                      List<PopupMenuItem> items = [PopupMenuItem(
                                         value: "Add to queue",
+                                        child: Text(S.of(context).AddToQueue),
                                       )];
                                       if (playlist.isOwned == true) {
-                                        items.add(const PopupMenuItem(
-                                          child: Text("Edit"),
+                                        items.add(PopupMenuItem(
                                           value: "Edit",
+                                          child: Text(S.of(context).Edit),
                                         ));
                                       }
                                       return items;
@@ -152,14 +154,14 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
                                             TextEditingController nameController = TextEditingController(text: playlist.name);
                                             TextEditingController descriptionController = TextEditingController(text: playlist.description);
                                             return AlertDialog(
-                                              title: const Text("Edit playlist"),
+                                              title: Text(S.of(context).EditPlaylist),
                                               content: Column(
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [
                                                   TextField(
                                                     controller: nameController,
-                                                    decoration: const InputDecoration(
-                                                      labelText: "Name",
+                                                    decoration: InputDecoration(
+                                                      labelText:S.of(context).Name,
                                                     ),
                                                   ),
                                                   Container(
@@ -168,8 +170,8 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
                                                       minLines: 3,
                                                       maxLines: 100,
                                                       controller: descriptionController,
-                                                      decoration: const InputDecoration(
-                                                        labelText: "Description",
+                                                      decoration: InputDecoration(
+                                                        labelText: S.of(context).Description,
                                                       ),
                                                     ),
                                                   ),
@@ -180,14 +182,14 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
                                                   onPressed: () {
                                                     Navigator.pop(context);
                                                   },
-                                                  child: const Text("Cancel"),
+                                                  child: Text(S.of(context).Cancel),
                                                 ),
                                                 TextButton(
                                                   onPressed: () {
                                                     Navigator.pop(context);
                                                     onUpdateMeta(playlist.id!, nameController.text, descriptionController.text);
                                                   },
-                                                  child: const Text("Save"),
+                                                  child: Text(S.of(context).Save),
                                                 ),
                                               ],
                                             );
@@ -202,19 +204,21 @@ class _PlaylistDetailState extends State<PlaylistDetail> {
                           ),
                           Expanded(
                             child: Container(
-                              margin: const EdgeInsets.only(top: 16),
                               child: ListView.builder(
                                 itemCount: playlist.getSongMetaList().length,
                                 itemBuilder: (context, index) {
                                   var song = playlist.getSongMetaList()[index];
-                                  return SongItem(
-                                      meta: song,
-                                    onPlaySong: (meta) {
-                                      playerProvider.playSongs([meta]);
-                                    },
-                                    onAddToQueue: (meta) {
-                                      playerProvider.addToQueue(meta);
-                                    },
+                                  return Container(
+                                    padding: const EdgeInsets.only(bottom: 8),
+                                    child: SongItem(
+                                        meta: song,
+                                      onPlaySong: (meta) {
+                                        playerProvider.playSongs([meta]);
+                                      },
+                                      onAddToQueue: (meta) {
+                                        playerProvider.addToQueue(meta);
+                                      },
+                                    ),
                                   );
                                 }
                               ),

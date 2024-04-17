@@ -7,6 +7,7 @@ import 'package:untitled/screens/home/provider.dart';
 import 'package:untitled/screens/library/library.dart';
 import 'package:untitled/screens/library/provider.dart';
 
+import '../generated/l10n.dart';
 import 'explore/provider.dart';
 
 class IndexPage extends StatefulWidget {
@@ -50,43 +51,22 @@ class _IndexPageState extends State<IndexPage> {
           onTap: onTabTapped,
           currentIndex: _currentIndex,
           backgroundColor: Theme.of(context).colorScheme.surface,
-          items: const [
+          items: [
             BottomNavigationBarItem(
               icon: Icon(Icons.edit),
-              label: 'Edit',
+              label: S.of(context).TabEdit,
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.explore),
-              label: 'Explore',
+              label: S.of(context).TabExplore,
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.library_music_rounded),
-              label: 'Library',
+              label: S.of(context).TabLibrary,
             ),
           ],
         ),
       ),
     );
-  }
-}
-
-class Tab1Page extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Tab 1 Page'));
-  }
-}
-
-class Tab2Page extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Tab 2 Page'));
-  }
-}
-
-class Tab3Page extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Tab 3 Page'));
   }
 }

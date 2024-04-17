@@ -1,13 +1,11 @@
 import 'dart:async';
-import 'dart:io' show Platform;
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:untitled/components/song_item.dart';
-import 'package:untitled/login.dart';
 import 'package:untitled/components/new_song_dialog.dart';
+import 'package:untitled/components/song_item.dart';
 import 'package:untitled/play_bar.dart';
 import 'package:untitled/player_provider.dart';
 import 'package:untitled/screens/home/provider.dart';
@@ -17,7 +15,6 @@ import 'package:untitled/store.dart';
 import '../../api/client.dart';
 import '../../api/entity.dart';
 import '../../generated/l10n.dart';
-import '../../input_token_dialog.dart';
 import '../../user_provider.dart';
 
 class HomePage extends StatefulWidget {

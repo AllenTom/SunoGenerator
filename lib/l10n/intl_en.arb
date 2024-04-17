@@ -16,5 +16,27 @@
   "NewSongDialogMusicTitle": "Title",
   "NewSongDialogPromptHint": "Enter a prompt",
   "NewSongDialogMakeInstrumental": "make instrumental",
-  "Generate": "Generate"
+  "Generate": "Generate",
+  "LoginWithWeb": "Login with web",
+  "LoginWithCookie": "Login with cookie",
+  "NoSongPlaying": "No song playing",
+  "TabEdit": "Edit",
+  "TabExplore": "Explore",
+  "TabLibrary": "Library",
+  "Trending": "Trending",
+  "New": "New",
+  "Songs": "Songs",
+  "Playlists": "Playlists",
+  "RenamePlaylist": "Rename playlist",
+  "Cancel": "Cancel",
+  "Save": "Save",
+  "Play": "Play",
+  "Download": "Download",
+  "Updating": "Updating",
+  "AddToQueue": "Add to queue",
+  "Edit": "Edit",
+  "EditPlaylist": "Edit playlist",
+  "Name": "Name",
+  "Description": "Description"
+
 }

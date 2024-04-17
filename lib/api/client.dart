@@ -14,7 +14,7 @@ import '../store.dart';
 class SunoClient {
   var dio = Dio();
   final String get_session_url =
-      "https://clerk.suno.ai/v1/client?_clerk_js_version=4.70.5";
+      "https://clerk.suno.com/v1/client";
   final String ua = RndX.getRandomUA();
   String token = "";
   String sid = "";

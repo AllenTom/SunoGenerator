@@ -41,7 +41,7 @@ class _UserLoginPageState extends State<UserLoginPage> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Text("Login",style: TextStyle(fontSize: 32),),
+            Text(S.of(context).Login,style: TextStyle(fontSize: 32),),
             Container(
               margin: const EdgeInsets.only(top: 32),
               width: double.infinity,
@@ -55,7 +55,7 @@ class _UserLoginPageState extends State<UserLoginPage> {
                     onLogin(result);
                   }
                 },
-                child: const Text('UserLogin'),
+                child: Text(S.of(context).LoginWithWeb),
               ),
             ),
             Container(
@@ -69,7 +69,7 @@ class _UserLoginPageState extends State<UserLoginPage> {
                       await onLogin(cookieString);
                     });
                   },
-                  child: Text('InputCookie')
+                  child: Text(S.of(context).LoginWithCookie)
               ),
             ),
           ],
