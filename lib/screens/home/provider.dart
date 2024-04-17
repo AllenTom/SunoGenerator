@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/api/client.dart';
+import 'package:collection/collection.dart';
 
 import '../../api/entity.dart';
-import 'home.dart';
 
 class HomeProvider with ChangeNotifier {
   SunoClient client = SunoClient();
@@ -18,6 +18,17 @@ class HomeProvider with ChangeNotifier {
       return;
     }
     songs = await client.getSongMetadata();
+    var notHaveMp3 = songs.where((element) {
+      return !element.hasMp3Url();
+    });
+    for (var element in notHaveMp3) {
+      GenerateItem? gSong = generatingSong.firstWhereOrNull((generatingSong){
+        return generatingSong.id == element.id;
+      });
+      if (gSong == null) {
+        generatingSong.add(GenerateItem(id: element.id!, title: element.title,imageUrl: element.imageUrl));
+      }
+    }
     notifyListeners();
   }
 
@@ -56,5 +67,10 @@ class HomeProvider with ChangeNotifier {
   deleteSong(String id) async {
     await client.deleteSongs([id]);
     await loadSongs(force: true);
+  }
+  getDisplaySongList() {
+    return songs.where((element) {
+      return element.hasMp3Url();
+    });
   }
 }

@@ -253,7 +253,7 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     ...homeProvider.generatingSong.map((e) {
                       return Container(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.only(bottom: 8),
                         child: Row(
                           children: [
                             Builder(builder: (context) {
@@ -297,7 +297,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       );
                     }),
-                    ...homeProvider.songs.map((e) {
+                    ...homeProvider.getDisplaySongList().map((e) {
                       return Container(
                         margin: const EdgeInsets.only(bottom: 8),
                         child: SongItem(
